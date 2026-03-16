@@ -61,19 +61,19 @@
                     <!-- Item 1 -->
                     <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/schedule_settings" android:textColor="@color/text_main" android:textSize="14sp"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/schedule_settings" />
                     </LinearLayout>
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
                     <!-- Item 2 -->
                     <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/sensor_calibration" android:textColor="@color/text_main" android:textSize="14sp"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/sensor_calibration" />
                     </LinearLayout>
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
                     <!-- Item 3 -->
                     <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/notif_alert_settings" android:textColor="@color/text_main" android:textSize="14sp"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/notif_alert_settings" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -85,12 +85,12 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/device_name_label" android:textColor="@color/text_main" android:textSize="14sp"/>
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/device_name_value" android:textColor="@color/text_sub" android:textSize="14sp"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_marginStart="8dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_marginStart="8dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/device_name_label" />
                     </LinearLayout>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/device_id_label" android:textColor="@color/text_main" android:textSize="14sp"/>
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/device_id_value" android:textColor="@color/text_sub" android:textSize="14sp"/>
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_marginStart="8dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:layout_marginStart="8dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/device_id_label" />
                     </LinearLayout>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/app_version_label" android:textColor="@color/text_main" android:textSize="14sp"/>
@@ -104,7 +104,7 @@
             <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="8dp" app:strokeWidth="1dp" app:strokeColor="#E0E0E0" android:layout_marginBottom="16dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/about_app" android:textColor="@color/text_main" android:textSize="14sp"/>
-                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/about_app" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -117,7 +117,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Copy -->
+    <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
@@ -128,20 +128,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" />
+
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" />
+        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" />
+        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" app:tint="@color/nav_active" />
+        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" app:tint="@color/nav_active" android:contentDescription="@string/pengaturan" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pengaturan" android:textColor="@color/nav_active" android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>

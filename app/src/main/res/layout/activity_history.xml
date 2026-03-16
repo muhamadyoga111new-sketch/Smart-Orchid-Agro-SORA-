@@ -63,6 +63,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- 24 April 2024 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,12 +82,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:padding="12dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active"/>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_1" android:textColor="@color/text_main" android:textSize="12sp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- 23 April 2024 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,9 +110,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:padding="12dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/history_time_2" android:textColor="@color/text_main" android:textSize="12sp"/>
-                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_2" android:textColor="@color/text_main" android:textSize="12sp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -125,16 +127,84 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:padding="12dp">
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/history_time_3" android:textColor="@color/text_main" android:textSize="12sp"/>
-                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub"/>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_3" android:textColor="@color/text_main" android:textSize="12sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 22 April 2024 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/date_sample_3"
+                android:textColor="@color/text_main"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_4" android:textColor="@color/text_main" android:textSize="12sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_5" android:textColor="@color/text_main" android:textSize="12sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 20 April 2024 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/date_sample_4"
+                android:textColor="@color/text_main"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="@string/history_time_6" android:textColor="@color/text_main" android:textSize="12sp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Copy -->
+    <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
@@ -146,20 +216,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" />
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" />
+        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_active" android:contentDescription="@string/riwayat" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/riwayat" android:textColor="@color/nav_active" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" />
+        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" />
+        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" android:contentDescription="@string/pengaturan" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>

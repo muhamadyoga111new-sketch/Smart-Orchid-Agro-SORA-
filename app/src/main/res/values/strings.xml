@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">IT PROJEK</string>
-    <string name="title_dashboard">Sist2em Penyiraman Anggrek</string>
+    <string name="title_dashboard">Sistem Penyiraman Anggrek</string>
     <string name="emergency_stop">Emergency Stop</string>
     <string name="soil_moisture">Kelembapan Tanah</string>
     <string name="moisture_value">32%</string>
@@ -21,20 +21,29 @@
     <!-- Riwayat -->
     <string name="title_history">Riwayat Penyiraman</string>
     <string name="date_sample_1">24 April 2024</string>
-    <string name="history_time_1">10:15 - 10:25 - Durasi: 10 menit</string>
+    <string name="history_time_1">10:15 - 10:25 · Durasi: 10 menit</string>
     <string name="date_sample_2">23 April 2024</string>
-    <string name="history_time_2">14:30 - 14:40 - Durasi: 10 menit</string>
-    <string name="history_time_3">08:00 - 08:10 - Durasi: 10 menit</string>
+    <string name="history_time_2">14:30 - 14:40 · Durasi: 10 menit</string>
+    <string name="history_time_3">08:00 - 08:10 · Durasi: 10 menit</string>
+    <string name="date_sample_3">22 April 2024</string>
+    <string name="history_time_4">17:00 - 17:12 · Durasi: 12 menit</string>
+    <string name="history_time_5">09:00 - 09:08 · Durasi: 8 menit</string>
+    <string name="date_sample_4">20 April 2024</string>
+    <string name="history_time_6">10:15 - 10:25 · Durasi: 10 menit</string>
 
     <!-- Notifikasi -->
     <string name="notif_dry_title">Tanah Kering</string>
-    <string name="notif_dry_desc">Kelembapan sangat rendah! Segera lakukan penyiraman!</string>
+    <string name="notif_dry_desc">Kelembapan sangat rendah!\nSegera lakukan penyiraman!</string>
     <string name="notif_tank_title">Air Tangki Habis</string>
-    <string name="notif_tank_desc">Level air tangki kosong! Segera isi ulang tangki!</string>
+    <string name="notif_tank_desc">Level air tangki kosong!\nSegera isi ulang tangki!</string>
     <string name="notif_moist_title">Tanah Lembap</string>
     <string name="notif_moist_desc">Kelembapan tanah normal</string>
     <string name="notif_pump_title">Pompa Menyala</string>
     <string name="notif_pump_desc">Pompa air sedang menyiram.</string>
+    <string name="notif_time_now">Baru saja</string>
+    <string name="notif_time_10min">10 menit yang lalu</string>
+    <string name="notif_time_today">Hari ini, 09:45</string>
+    <string name="notif_time_yesterday">Kemarin, 16:00</string>
 
     <!-- Pengaturan -->
     <string name="system_settings">Pengaturan Sistem</string>
