@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">IT PROJEK</string>
+    <string name="title_dashboard">Sist2em Penyiraman Anggrek</string>
+    <string name="emergency_stop">Emergency Stop</string>
+    <string name="soil_moisture">Kelembapan Tanah</string>
+    <string name="moisture_value">32%</string>
+    <string name="kering">Kering</string>
+    <string name="normal">Normal</string>
+    <string name="lembap">Lembap</string>
+    <string name="water_level">Level Air Tangki</string>
+    <string name="water_value">45%</string>
+    <string name="pump_control">Kontrol Pompa</string>
+    <string name="pump_status">Status Pompa:</string>
+    <string name="off">OFF</string>
+    <string name="on">ON</string>
+    <string name="beranda">Beranda</string>
+    <string name="riwayat">Riwayat</string>
+    <string name="notifikasi">Notifikasi</string>
+    <string name="pengaturan">Pengaturan</string>
+
+    <!-- Riwayat -->
+    <string name="title_history">Riwayat Penyiraman</string>
+    <string name="date_sample_1">24 April 2024</string>
+    <string name="history_time_1">10:15 - 10:25 - Durasi: 10 menit</string>
+    <string name="date_sample_2">23 April 2024</string>
+    <string name="history_time_2">14:30 - 14:40 - Durasi: 10 menit</string>
+    <string name="history_time_3">08:00 - 08:10 - Durasi: 10 menit</string>
+
+    <!-- Notifikasi -->
+    <string name="notif_dry_title">Tanah Kering</string>
+    <string name="notif_dry_desc">Kelembapan sangat rendah! Segera lakukan penyiraman!</string>
+    <string name="notif_tank_title">Air Tangki Habis</string>
+    <string name="notif_tank_desc">Level air tangki kosong! Segera isi ulang tangki!</string>
+    <string name="notif_moist_title">Tanah Lembap</string>
+    <string name="notif_moist_desc">Kelembapan tanah normal</string>
+    <string name="notif_pump_title">Pompa Menyala</string>
+    <string name="notif_pump_desc">Pompa air sedang menyiram.</string>
+
+    <!-- Pengaturan -->
+    <string name="system_settings">Pengaturan Sistem</string>
+    <string name="schedule_settings">Pengaturan Jadwal Penyiraman</string>
+    <string name="sensor_calibration">Kalibrasi Sensor</string>
+    <string name="notif_alert_settings">Notifikasi &amp; Peringatan</string>
+    <string name="device_info">Informasi Perangkat</string>
+    <string name="device_name_label">Nama Perangkat</string>
+    <string name="device_name_value">Sistem Anggrek 01</string>
+    <string name="device_id_label">ID Perangkat</string>
+    <string name="device_id_value">ANG-123456</string>
+    <string name="app_version_label">Versi Aplikasi</string>
+    <string name="app_version_value">v1.0.3</string>
+    <string name="about">About</string>
+    <string name="about_app">Tentang Aplikasi</string>
+</resources>

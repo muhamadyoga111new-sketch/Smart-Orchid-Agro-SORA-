@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green_header">#4CAF50</color>
+    <color name="green_emergency_bg">#EDF7ED</color>
+    <color name="green_emergency_icon">#4CAF50</color>
+    <color name="grey_emergency_bar">#546E7A</color>
+    <color name="bg_app">#F5F5F5</color>
+    <color name="text_main">#263238</color>
+    <color name="text_sub">#78909C</color>
+    <color name="gauge_red">#FF5252</color>
+    <color name="gauge_yellow">#FFD740</color>
+    <color name="gauge_green">#66BB6A</color>
+    <color name="water_blue">#2196F3</color>
+    <color name="water_tank_bg">#ECEFF1</color>
+    <color name="switch_on">#4CAF50</color>
+    <color name="switch_off">#9E9E9E</color>
+    <color name="nav_active">#4CAF50</color>
+    <color name="nav_inactive">#78909C</color>
+</resources>
