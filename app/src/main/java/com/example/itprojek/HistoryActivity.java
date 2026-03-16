@@ -1,7 +1,11 @@
 package com.example.itprojek;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -14,13 +18,14 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
+        hideSystemNavBar();
+
         // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
         // Bottom Navigation
         LinearLayout navHome = findViewById(R.id.nav_home);
-        LinearLayout navHistory = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
@@ -28,8 +33,6 @@ public class HistoryActivity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });
-
-        // navHistory is current screen, no action needed
 
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
@@ -40,5 +43,31 @@ public class HistoryActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             finish();
         });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemNavBar();
+        }
+    }
+
+    private void hideSystemNavBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        }
     }
 }

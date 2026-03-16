@@ -59,19 +59,19 @@
             <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="8dp" app:strokeWidth="1dp" app:strokeColor="#E0E0E0" android:layout_marginBottom="16dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <!-- Item 1 -->
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
+                    <LinearLayout android:id="@+id/item_schedule" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/schedule_settings" android:textColor="@color/text_main" android:textSize="14sp"/>
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/schedule_settings" />
                     </LinearLayout>
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
                     <!-- Item 2 -->
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
+                    <LinearLayout android:id="@+id/item_calibration" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/sensor_calibration" android:textColor="@color/text_main" android:textSize="14sp"/>
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/sensor_calibration" />
                     </LinearLayout>
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0"/>
                     <!-- Item 3 -->
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
+                    <LinearLayout android:id="@+id/item_notif_alert" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingHorizontal="16dp">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/notif_alert_settings" android:textColor="@color/text_main" android:textSize="14sp"/>
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_back" android:rotation="180" app:tint="@color/text_sub" android:contentDescription="@string/notif_alert_settings" />
                     </LinearLayout>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_app">
+
+    <!-- Header -->
+    <View
+        android:id="@+id/header_bg"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@color/green_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="@id/header_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/header_bg" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sensor_calibration"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/header_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/header_bg" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Description -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/calib_desc"
+                android:textColor="@color/text_sub"
+                android:textSize="13sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Kering Slider -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingVertical="4dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="@string/kering" android:textColor="@color/text_main" android:textSize="14sp" />
+                <SeekBar
+                    android:id="@+id/seekbar_kering"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="30"
+                    android:progressTint="@color/nav_active"
+                    android:thumbTint="@color/nav_active" />
+                <TextView android:id="@+id/tv_kering_value" android:layout_width="48dp" android:layout_height="wrap_content" android:text="@string/persen_30" android:textColor="@color/text_main" android:textSize="14sp" android:gravity="end" />
+            </LinearLayout>
+
+            <!-- Kering Range -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="80dp" android:paddingEnd="48dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/min_5" android:textColor="@color/text_sub" android:textSize="10sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/max_30" android:textColor="@color/text_sub" android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- Normal Slider -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="12dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="@string/normal" android:textColor="@color/text_main" android:textSize="14sp" />
+                <SeekBar
+                    android:id="@+id/seekbar_normal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressTint="@color/nav_active"
+                    android:thumbTint="@color/nav_active" />
+                <TextView android:id="@+id/tv_normal_value" android:layout_width="48dp" android:layout_height="wrap_content" android:text="@string/persen_50" android:textColor="@color/text_main" android:textSize="14sp" android:gravity="end" />
+            </LinearLayout>
+
+            <!-- Normal Range -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="80dp" android:paddingEnd="48dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="31 - 50%" android:textColor="@color/text_sub" android:textSize="10sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="60%" android:textColor="@color/text_sub" android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- Lembap Slider -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="12dp">
+                <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="@string/lembap" android:textColor="@color/text_main" android:textSize="14sp" />
+                <SeekBar
+                    android:id="@+id/seekbar_lembap"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressTint="@color/nav_active"
+                    android:thumbTint="@color/nav_active" />
+                <TextView android:id="@+id/tv_lembap_value" android:layout_width="48dp" android:layout_height="wrap_content" android:text="@string/persen_50" android:textColor="@color/text_main" android:textSize="14sp" android:gravity="end" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Save Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/sensor_calibration"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:backgroundTint="@color/nav_active"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_active" android:contentDescription="@string/beranda" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/beranda" android:textColor="@color/nav_active" android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" app:tint="@color/nav_inactive" android:contentDescription="@string/pengaturan" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

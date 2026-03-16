@@ -23,6 +23,9 @@
         <activity android:name=".HistoryActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".ScheduleActivity" />
+        <activity android:name=".CalibrationActivity" />
+        <activity android:name=".NotifAlertActivity" />
     </application>
 
 </manifest>
