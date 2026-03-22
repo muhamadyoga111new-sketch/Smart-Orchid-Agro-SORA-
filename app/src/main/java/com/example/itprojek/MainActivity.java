@@ -24,27 +24,39 @@ public class MainActivity extends AppCompatActivity {
 
         hideSystemNavBar();
 
+        // Apply status bar insets only to header content (icons/title), not root layout
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            v.setPadding(systemBars.left, 0, systemBars.right, 0);
+
+            // Offset header content below status bar
+            View btnMenu = findViewById(R.id.btn_menu);
+            View btnNotif = findViewById(R.id.btn_notification_top);
+            if (btnMenu != null) {
+                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnMenu.getLayoutParams()).topMargin = systemBars.top + 8;
+                btnMenu.requestLayout();
+            }
+            if (btnNotif != null) {
+                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnNotif.getLayoutParams()).topMargin = systemBars.top + 8;
+                btnNotif.requestLayout();
+            }
             return insets;
         });
 
-        // Notification bell in header
+        // Notification bell in header — push navigation (slide)
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
         btnNotification.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // Emergency Stop panel — Peak-End Rule: confirmation dialog for critical action
+        // Emergency Stop panel
         LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
         emergencyPanel.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.confirm_emergency_title))
                     .setMessage(getString(R.string.confirm_emergency_msg))
                     .setPositiveButton(getString(R.string.btn_yes), (dialog, which) -> {
-                        // Emergency stop activated
                         dialog.dismiss();
                     })
                     .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
@@ -54,24 +66,24 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-        // Bottom Navigation
+        // Bottom Navigation — tab switch (crossfade, like Instagram)
         LinearLayout navHistory = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
         navHistory.setOnClickListener(v -> {
             startActivity(new Intent(this, HistoryActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         navSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
     }
 

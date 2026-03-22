@@ -13,6 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -23,6 +26,7 @@ public class CalibrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
         hideSystemNavBar();
+        applyStatusBarInsets();
 
         // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
@@ -71,8 +75,19 @@ public class CalibrationActivity extends AppCompatActivity {
             finish();
         });
 
-        // Bottom Navigation
+        // Bottom Navigation — tab switch (crossfade)
         setupBottomNav();
+    }
+
+    private void applyStatusBarInsets() {
+        View headerBg = findViewById(R.id.header_bg);
+        ViewCompat.setOnApplyWindowInsetsListener(headerBg, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            v.getLayoutParams().height = (int) (60 * getResources().getDisplayMetrics().density) + systemBars.top;
+            v.setPadding(0, systemBars.top, 0, 0);
+            v.requestLayout();
+            return insets;
+        });
     }
 
     private void setupBottomNav() {
@@ -83,22 +98,22 @@ public class CalibrationActivity extends AppCompatActivity {
 
         navHome.setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
         navHistory.setOnClickListener(v -> {
             startActivity(new Intent(this, HistoryActivity.class));
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
         navSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
     }

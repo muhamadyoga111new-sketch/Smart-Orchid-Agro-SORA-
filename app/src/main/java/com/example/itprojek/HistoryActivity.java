@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -19,32 +22,44 @@ public class HistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history);
 
         hideSystemNavBar();
+        applyStatusBarInsets();
 
-        // Back button
+        // Back button — pop navigation (slide back)
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Bottom Navigation
+        // Bottom Navigation — tab switch (crossfade, like Instagram)
         LinearLayout navHome = findViewById(R.id.nav_home);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
         navHome.setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
 
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
 
         navSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
+        });
+    }
+
+    private void applyStatusBarInsets() {
+        View headerBg = findViewById(R.id.header_bg);
+        ViewCompat.setOnApplyWindowInsetsListener(headerBg, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            v.getLayoutParams().height = (int) (60 * getResources().getDisplayMetrics().density) + systemBars.top;
+            v.setPadding(0, systemBars.top, 0, 0);
+            v.requestLayout();
+            return insets;
         });
     }
 
