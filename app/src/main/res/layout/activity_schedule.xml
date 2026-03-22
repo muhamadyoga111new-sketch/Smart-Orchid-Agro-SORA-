@@ -17,11 +17,13 @@
 
     <ImageView
         android:id="@+id/btn_back"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/app_name"
+        android:padding="8dp"
         android:src="@drawable/ic_back"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/header_bg" />
@@ -31,7 +33,7 @@
         android:layout_height="wrap_content"
         android:text="@string/schedule_settings"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,6 +43,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,139 +55,189 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Penyiraman Otomatis -->
-            <LinearLayout
+            <!-- Penyiraman Otomatis Card (Law of Common Region) -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingVertical="12dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/auto_watering"
-                    android:textColor="@color/text_main"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_auto_watering"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    app:thumbTint="@color/white"
-                    app:trackTint="@color/switch_on" />
-            </LinearLayout>
-
-            <!-- Time -->
-            <LinearLayout
-                android:id="@+id/layout_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingVertical="12dp">
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_history"
-                    app:tint="@color/text_sub"
-                    android:contentDescription="@string/default_time" />
-                <TextView
-                    android:id="@+id/tv_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="@string/default_time"
-                    android:textColor="@color/text_main"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Day Selector -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingVertical="12dp">
-
-                <TextView android:id="@+id/day_sen" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_sen" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" android:layout_marginEnd="4dp" />
-                <TextView android:id="@+id/day_sel" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_sel" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" android:layout_marginEnd="4dp" />
-                <TextView android:id="@+id/day_rab" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_rab" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" android:layout_marginEnd="4dp" />
-                <TextView android:id="@+id/day_kam" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_kam" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" android:layout_marginEnd="4dp" />
-                <TextView android:id="@+id/day_jum" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_jum" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" android:layout_marginEnd="4dp" />
-                <TextView android:id="@+id/day_sab" android:layout_width="40dp" android:layout_height="40dp" android:gravity="center" android:text="@string/day_sab" android:textSize="12sp" android:background="@drawable/bg_card" android:textColor="@color/white" />
-            </LinearLayout>
-
-            <!-- Durasi -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingVertical="12dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/card_stroke"
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/durasi"
-                        android:textColor="@color/text_main"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/tv_durasi_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/durasi_value"
-                        android:textColor="@color/nav_active"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <SeekBar
-                    android:id="@+id/seekbar_durasi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:max="25"
-                    android:progress="5"
-                    android:progressTint="@color/nav_active"
-                    android:thumbTint="@color/nav_active" />
+                    <!-- Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/auto_watering"
+                            android:textColor="@color/text_main"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switch_auto_watering"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            app:thumbTint="@color/white"
+                            app:trackTint="@color/switch_on" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/divider" />
+
+                    <!-- Time (Fitts's Law: large touch area) -->
+                    <LinearLayout
+                        android:id="@+id/layout_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/nav_active"
+                            android:contentDescription="@string/default_time" />
+
+                        <TextView
+                            android:id="@+id/tv_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/default_time"
+                            android:textColor="@color/text_main"
+                            android:textSize="32sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/divider" />
+
+                    <!-- Day Selector (Law of Similarity: circle shapes, Fitts's Law: 44dp) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingVertical="4dp">
+
+                        <TextView android:id="@+id/day_sen" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_sen" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/day_sel" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_sel" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/day_rab" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_rab" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/day_kam" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_kam" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/day_jum" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_jum" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/day_sab" android:layout_width="44dp" android:layout_height="44dp" android:gravity="center" android:text="@string/day_sab" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Durasi Card (Law of Common Region: separate section) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/card_stroke"
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="0dp"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/min_5"
-                        android:textColor="@color/text_sub"
-                        android:textSize="12sp" />
-                    <TextView
-                        android:layout_width="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/durasi"
+                            android:textColor="@color/text_main"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_durasi_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/durasi_value"
+                            android:textColor="@color/nav_active"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekbar_durasi"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/max_30"
-                        android:textColor="@color/text_sub"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="12dp"
+                        android:max="25"
+                        android:progress="5"
+                        android:progressTint="@color/nav_active"
+                        android:thumbTint="@color/nav_active" />
+
+                    <!-- Postel's Law: clear min/max -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/min_5"
+                            android:textColor="@color/text_caption"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/max_30"
+                            android:textColor="@color/text_caption"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Kalibrasi Sensor Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_kalibrasi"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="56dp"
                 android:text="@string/sensor_calibration"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
+                android:textStyle="bold"
                 app:backgroundTint="@color/nav_active"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
     </ScrollView>
@@ -193,29 +246,29 @@
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:background="@color/white"
-        android:elevation="8dp"
+        android:elevation="12dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_active" android:contentDescription="@string/beranda" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/beranda" android:textColor="@color/nav_active" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_active" android:contentDescription="@string/beranda" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_active" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" app:tint="@color/nav_inactive" android:contentDescription="@string/pengaturan" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" app:tint="@color/nav_inactive" android:contentDescription="@string/pengaturan" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 

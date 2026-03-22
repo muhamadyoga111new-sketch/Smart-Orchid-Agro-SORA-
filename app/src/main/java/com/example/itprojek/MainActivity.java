@@ -9,6 +9,7 @@ import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -33,6 +34,23 @@ public class MainActivity extends AppCompatActivity {
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
         btnNotification.setOnClickListener(v ->
                 startActivity(new Intent(this, NotificationsActivity.class)));
+
+        // Emergency Stop panel — Peak-End Rule: confirmation dialog for critical action
+        LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
+        emergencyPanel.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.confirm_emergency_title))
+                    .setMessage(getString(R.string.confirm_emergency_msg))
+                    .setPositiveButton(getString(R.string.btn_yes), (dialog, which) -> {
+                        // Emergency stop activated
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .setCancelable(true)
+                    .show();
+        });
 
         // Bottom Navigation
         LinearLayout navHistory = findViewById(R.id.nav_history);

@@ -2,20 +2,51 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="green_header">#4CAF50</color>
-    <color name="green_emergency_bg">#EDF7ED</color>
-    <color name="green_emergency_icon">#4CAF50</color>
+    <color name="green_header">#388E3C</color>
+    <color name="green_header_light">#4CAF50</color>
+    <color name="green_emergency_bg">#FFF3E0</color>
+    <color name="green_emergency_icon">#E65100</color>
     <color name="grey_emergency_bar">#546E7A</color>
-    <color name="bg_app">#F5F5F5</color>
-    <color name="text_main">#263238</color>
-    <color name="text_sub">#78909C</color>
-    <color name="gauge_red">#FF5252</color>
-    <color name="gauge_yellow">#FFD740</color>
+    <color name="bg_app">#F5F7F5</color>
+    <color name="text_main">#1B2631</color>
+    <color name="text_sub">#607D8B</color>
+    <color name="text_caption">#90A4AE</color>
+    <color name="gauge_red">#EF5350</color>
+    <color name="gauge_yellow">#FFC107</color>
     <color name="gauge_green">#66BB6A</color>
-    <color name="water_blue">#2196F3</color>
-    <color name="water_tank_bg">#ECEFF1</color>
-    <color name="switch_on">#4CAF50</color>
-    <color name="switch_off">#9E9E9E</color>
-    <color name="nav_active">#4CAF50</color>
-    <color name="nav_inactive">#78909C</color>
+    <color name="water_blue">#1E88E5</color>
+    <color name="water_tank_bg">#E3F2FD</color>
+    <color name="switch_on">#43A047</color>
+    <color name="switch_off">#BDBDBD</color>
+    <color name="nav_active">#388E3C</color>
+    <color name="nav_inactive">#90A4AE</color>
+
+    <!-- Semantic card colors -->
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#E8EAE8</color>
+    <color name="divider">#EEEEEE</color>
+
+    <!-- Notification severity colors (Von Restorff Effect) -->
+    <color name="notif_warning">#EF5350</color>
+    <color name="notif_warning_bg">#FFEBEE</color>
+    <color name="notif_info">#1E88E5</color>
+    <color name="notif_info_bg">#E3F2FD</color>
+    <color name="notif_success">#43A047</color>
+    <color name="notif_success_bg">#E8F5E9</color>
+
+    <!-- Emergency (Von Restorff Effect) -->
+    <color name="emergency_bg">#FFF3E0</color>
+    <color name="emergency_border">#FF6D00</color>
+    <color name="emergency_icon">#E65100</color>
+
+    <!-- Day selector -->
+    <color name="day_selected_bg">#388E3C</color>
+    <color name="day_unselected_bg">#E8F5E9</color>
+    <color name="day_unselected_text">#388E3C</color>
+
+    <!-- Ripple -->
+    <color name="ripple_color">#1A388E3C</color>
+
+    <!-- Section header -->
+    <color name="section_header">#37474F</color>
 </resources>

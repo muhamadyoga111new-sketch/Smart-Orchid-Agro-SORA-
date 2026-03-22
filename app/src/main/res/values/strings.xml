@@ -100,4 +100,15 @@
     <string name="alert_tank_alarm_title">Alarm Air Tangki Habis</string>
     <string name="alert_tank_alarm_desc">Jika level air tangki kosong, siraman otomatis akan dihentikan untuk mencegah kerusakan pompa.</string>
     <string name="saved_toast">Pengaturan disimpan!</string>
+
+    <!-- Laws of UX additions -->
+    <string name="section_monitoring">Monitoring</string>
+    <string name="section_control">Kontrol</string>
+    <string name="status_connected">Terhubung</string>
+    <string name="greeting_label">Selamat datang!</string>
+    <string name="confirm_emergency_title">Konfirmasi Emergency Stop</string>
+    <string name="confirm_emergency_msg">Apakah Anda yakin ingin mengaktifkan Emergency Stop? Semua sistem penyiraman akan dihentikan.</string>
+    <string name="btn_yes">Ya, Hentikan</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="simpan_pengaturan">Simpan Pengaturan</string>
 </resources>

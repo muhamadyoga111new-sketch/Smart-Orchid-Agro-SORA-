@@ -18,11 +18,13 @@
 
     <ImageView
         android:id="@+id/btn_back"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/app_name"
+        android:padding="8dp"
         android:src="@drawable/ic_back"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/header_bg" />
@@ -40,12 +42,14 @@
         app:layout_constraintTop_toTopOf="@id/header_bg" />
 
     <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/notifikasi"
+        android:padding="8dp"
         android:src="@drawable/ic_notification"
         app:tint="@color/white"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/header_bg" />
@@ -53,6 +57,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,69 +69,203 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Notif 1: Tanah Kering -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Notif 1: Tanah Kering — WARNING (Von Restorff: red left accent) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="8dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp">
-                    <ImageView android:id="@+id/icon1" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_warning" android:contentDescription="@string/notif_dry_title" />
-                    <TextView android:id="@+id/t1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/icon1" android:layout_marginStart="12dp" android:text="@string/notif_dry_title" android:textStyle="bold" android:textColor="@color/text_main"/>
-                    <TextView android:id="@+id/d1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/t1" android:layout_toEndOf="@id/icon1" android:layout_marginStart="12dp" android:text="@string/notif_dry_desc" android:textSize="12sp" android:textColor="@color/text_sub"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/d1" android:layout_toEndOf="@id/icon1" android:layout_marginStart="12dp" android:layout_marginTop="4dp" android:text="@string/notif_time_now" android:textSize="10sp" android:textColor="@color/text_sub"/>
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:background="@drawable/bg_notif_warning"
+                android:elevation="2dp"
+                android:padding="16dp">
 
-            <!-- Notif 2: Air Tangki Habis -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="8dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp">
-                    <ImageView android:id="@+id/icon2" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/water_blue" android:contentDescription="@string/notif_tank_title" />
-                    <TextView android:id="@+id/t2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/icon2" android:layout_marginStart="12dp" android:text="@string/notif_tank_title" android:textStyle="bold" android:textColor="@color/text_main"/>
-                    <TextView android:id="@+id/d2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/t2" android:layout_toEndOf="@id/icon2" android:layout_marginStart="12dp" android:text="@string/notif_tank_desc" android:textSize="12sp" android:textColor="@color/text_sub"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/d2" android:layout_toEndOf="@id/icon2" android:layout_marginStart="12dp" android:layout_marginTop="4dp" android:text="@string/notif_time_10min" android:textSize="10sp" android:textColor="@color/text_sub"/>
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_warning"
+                    app:tint="@color/notif_warning"
+                    android:contentDescription="@string/notif_dry_title" />
 
-            <!-- Notif 3: Tanah Lembap -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="8dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp">
-                    <ImageView android:id="@+id/icon3" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/gauge_green" android:contentDescription="@string/notif_moist_title" />
-                    <TextView android:id="@+id/t3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/icon3" android:layout_marginStart="12dp" android:text="@string/notif_moist_title" android:textStyle="bold" android:textColor="@color/text_main"/>
-                    <TextView android:id="@+id/d3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/t3" android:layout_toEndOf="@id/icon3" android:layout_marginStart="12dp" android:text="@string/notif_moist_desc" android:textSize="12sp" android:textColor="@color/text_sub"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/d3" android:layout_toEndOf="@id/icon3" android:layout_marginStart="12dp" android:layout_marginTop="4dp" android:text="@string/notif_time_today" android:textSize="10sp" android:textColor="@color/text_sub"/>
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
 
-            <!-- Notif 4: Pompa Menyala -->
-            <com.google.android.material.card.MaterialCardView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notif_dry_title"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/notif_dry_desc"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="2dp"
+                        android:textColor="@color/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/notif_time_now"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_caption" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Notif 2: Air Tangki Habis — WARNING (red accent) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="8dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp">
-                    <ImageView android:id="@+id/icon4" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/switch_on" android:contentDescription="@string/notif_pump_title" />
-                    <TextView android:id="@+id/t4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/icon4" android:layout_marginStart="12dp" android:text="@string/notif_pump_title" android:textStyle="bold" android:textColor="@color/text_main"/>
-                    <TextView android:id="@+id/d4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/t4" android:layout_toEndOf="@id/icon4" android:layout_marginStart="12dp" android:text="@string/notif_pump_desc" android:textSize="12sp" android:textColor="@color/text_sub"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/d4" android:layout_toEndOf="@id/icon4" android:layout_marginStart="12dp" android:layout_marginTop="4dp" android:text="@string/notif_time_yesterday" android:textSize="10sp" android:textColor="@color/text_sub"/>
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:background="@drawable/bg_notif_warning"
+                android:elevation="2dp"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_warning"
+                    app:tint="@color/notif_warning"
+                    android:contentDescription="@string/notif_tank_title" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notif_tank_title"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/notif_tank_desc"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="2dp"
+                        android:textColor="@color/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/notif_time_10min"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_caption" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Notif 3: Tanah Lembap — SUCCESS (green accent) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_notif_success"
+                android:elevation="2dp"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/notif_success"
+                    android:contentDescription="@string/notif_moist_title" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notif_moist_title"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/notif_moist_desc"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/notif_time_today"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_caption" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Notif 4: Pompa Menyala — INFO (blue accent) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_notif_info"
+                android:elevation="2dp"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/notif_info"
+                    android:contentDescription="@string/notif_pump_title" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notif_pump_title"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/notif_pump_desc"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_sub" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/notif_time_yesterday"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_caption" />
+                </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
@@ -135,29 +274,29 @@
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:background="@color/white"
-        android:elevation="8dp"
+        android:elevation="12dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_notification" app:tint="@color/nav_active" android:contentDescription="@string/notifikasi" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/notifikasi" android:textColor="@color/nav_active" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_notification" app:tint="@color/nav_active" android:contentDescription="@string/notifikasi" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_active" android:textSize="11sp" android:textStyle="bold" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_settings" android:contentDescription="@string/pengaturan" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" android:contentDescription="@string/pengaturan" app:tint="@color/nav_inactive" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 

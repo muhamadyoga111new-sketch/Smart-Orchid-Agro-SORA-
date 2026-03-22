@@ -8,23 +8,25 @@
     android:background="@color/bg_app"
     tools:context=".MainActivity">
 
-    <!-- Header -->
+    <!-- Header (Aesthetic-Usability: gradient bg, larger touch targets) -->
     <View
         android:id="@+id/header_bg"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="130dp"
         android:background="@drawable/bg_header"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Fitts's Law: 40dp icon + 8dp padding = 48dp touch target -->
     <ImageView
         android:id="@+id/btn_menu"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:contentDescription="@string/app_name"
+        android:padding="4dp"
         android:src="@drawable/ic_menu"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,14 +44,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_menu" />
 
+    <!-- Fitts's Law: 40dp icon for notification -->
     <ImageView
         android:id="@+id/btn_notification_top"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/notifikasi"
+        android:padding="4dp"
         android:src="@drawable/ic_notification"
+        app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,6 +63,7 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="80dp"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,32 +74,50 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
 
-            <!-- Emergency Stop -->
+            <!-- Emergency Stop (Von Restorff Effect: orange border, distinct from green cards) -->
             <LinearLayout
+                android:id="@+id/emergency_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-40dp"
                 android:background="@drawable/bg_emergency"
-                android:elevation="4dp"
+                android:elevation="6dp"
                 android:gravity="center_vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:contentDescription="@string/emergency_stop"
-                    android:src="@drawable/ic_emergency" />
+                    android:src="@drawable/ic_emergency"
+                    app:tint="@color/emergency_icon" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="@string/emergency_stop"
-                    android:textColor="@color/text_main"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/emergency_stop"
+                        android:textColor="@color/emergency_icon"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/status_connected"
+                        android:textColor="@color/text_sub"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
                 <View
                     android:layout_width="80dp"
@@ -101,21 +125,32 @@
                     android:background="@color/grey_emergency_bar" />
             </LinearLayout>
 
-            <!-- Kelembapan Tanah -->
+            <!-- Section: Monitoring (Law of Proximity: grouped with header) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"
+                android:text="@string/section_monitoring"
+                android:textColor="@color/section_header"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+            <!-- Kelembapan Tanah (Aesthetic-Usability: elevated card, 16dp corners) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -128,7 +163,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
-                        android:layout_marginTop="8dp">
+                        android:layout_marginTop="12dp">
 
                         <!-- Simple Gauge Placeholder -->
                         <View
@@ -145,10 +180,11 @@
                             android:layout_centerInParent="true"
                             android:text="@string/moisture_value"
                             android:textColor="@color/text_main"
-                            android:textSize="36sp"
+                            android:textSize="40sp"
                             android:textStyle="bold" />
                     </RelativeLayout>
 
+                    <!-- Postel's Law: clear labels for ranges -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -160,14 +196,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/kering"
-                            android:textColor="@color/text_sub"
+                            android:textColor="@color/gauge_red"
                             android:textSize="12sp" />
 
                         <View
                             android:layout_width="30dp"
                             android:layout_height="1dp"
                             android:layout_marginHorizontal="8dp"
-                            android:background="@color/text_sub" />
+                            android:background="@color/divider" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -181,34 +217,34 @@
                             android:layout_width="30dp"
                             android:layout_height="1dp"
                             android:layout_marginHorizontal="8dp"
-                            android:background="@color/text_sub" />
+                            android:background="@color/divider" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/lembap"
-                            android:textColor="@color/text_sub"
+                            android:textColor="@color/water_blue"
                             android:textSize="12sp" />
                     </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Level Air Tangki -->
+            <!-- Level Air Tangki (Law of Proximity: 12dp gap to sibling) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -221,7 +257,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
-                        android:layout_marginTop="8dp">
+                        android:layout_marginTop="12dp">
 
                         <View
                             android:id="@+id/tank_outline"
@@ -243,27 +279,38 @@
                             android:layout_centerInParent="true"
                             android:text="@string/water_value"
                             android:textColor="@color/white"
-                            android:textSize="22sp"
+                            android:textSize="24sp"
                             android:textStyle="bold" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Section: Kontrol (Law of Proximity: 24dp gap between sections) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"
+                android:text="@string/section_control"
+                android:textColor="@color/section_header"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
             <!-- Kontrol Pompa -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E0E0E0"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -273,11 +320,13 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
+                    <!-- Fitts's Law: larger interactive area -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:gravity="center_vertical"
+                        android:minHeight="48dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -329,13 +378,13 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Fitts's Law: 72dp height, larger touch targets) -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:background="@color/white"
-        android:elevation="8dp"
+        android:elevation="12dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -347,11 +396,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="@string/beranda"
                 android:src="@drawable/ic_home"
                 app:tint="@color/nav_active" />
@@ -359,9 +409,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="@string/beranda"
                 android:textColor="@color/nav_active"
-                android:textSize="11sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -370,17 +422,20 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="@string/riwayat"
-                android:src="@drawable/ic_history" />
+                android:src="@drawable/ic_history"
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="@string/riwayat"
                 android:textColor="@color/nav_inactive"
                 android:textSize="11sp" />
@@ -392,11 +447,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="@string/notifikasi"
                 android:src="@drawable/ic_notification"
                 app:tint="@color/nav_inactive" />
@@ -404,6 +460,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="@string/notifikasi"
                 android:textColor="@color/nav_inactive"
                 android:textSize="11sp" />
@@ -415,17 +472,20 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="@string/pengaturan"
-                android:src="@drawable/ic_settings" />
+                android:src="@drawable/ic_settings"
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="@string/pengaturan"
                 android:textColor="@color/nav_inactive"
                 android:textSize="11sp" />

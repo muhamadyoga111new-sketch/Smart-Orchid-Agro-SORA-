@@ -86,11 +86,11 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private void updateDayStyle(TextView dayView, boolean selected) {
         if (selected) {
-            dayView.setBackgroundResource(R.drawable.bg_card);
+            dayView.setBackgroundResource(R.drawable.bg_day_selected);
             dayView.setTextColor(getResources().getColor(R.color.white, null));
         } else {
-            dayView.setBackgroundResource(R.drawable.bg_emergency);
-            dayView.setTextColor(getResources().getColor(R.color.text_sub, null));
+            dayView.setBackgroundResource(R.drawable.bg_day_unselected);
+            dayView.setTextColor(getResources().getColor(R.color.day_unselected_text, null));
         }
     }
 
