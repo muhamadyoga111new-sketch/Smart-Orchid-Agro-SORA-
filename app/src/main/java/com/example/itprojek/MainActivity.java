@@ -32,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Notification bell in header
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
-        btnNotification.setOnClickListener(v ->
-                startActivity(new Intent(this, NotificationsActivity.class)));
+        btnNotification.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
 
         // Emergency Stop panel — Peak-End Rule: confirmation dialog for critical action
         LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
@@ -57,14 +59,20 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
-        navHistory.setOnClickListener(v ->
-                startActivity(new Intent(this, HistoryActivity.class)));
+        navHistory.setOnClickListener(v -> {
+            startActivity(new Intent(this, HistoryActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
 
-        navNotifications.setOnClickListener(v ->
-                startActivity(new Intent(this, NotificationsActivity.class)));
+        navNotifications.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
 
-        navSettings.setOnClickListener(v ->
-                startActivity(new Intent(this, SettingsActivity.class)));
+        navSettings.setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
     }
 
     @Override
