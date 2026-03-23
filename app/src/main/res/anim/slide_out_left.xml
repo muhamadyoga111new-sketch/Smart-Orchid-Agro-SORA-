@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Instagram-style: parallax shift left + dim (exiting behind new activity) -->
+<!-- EXIT animation: old Activity slides out to left (FULL slide to eliminate ghosting) -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:anim/accelerate_decelerate_interpolator">
 
     <translate
         android:fromXDelta="0%p"
-        android:toXDelta="-25%p"
+        android:toXDelta="-100%p"
         android:duration="300" />
 
     <alpha
         android:fromAlpha="1.0"
-        android:toAlpha="0.7"
-        android:duration="300" />
+        android:toAlpha="0.0"
+        android:startOffset="150"
+        android:duration="150" />
 
 </set>

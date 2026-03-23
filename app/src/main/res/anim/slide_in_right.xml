@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Instagram-style: slide in from right + fade in (entering activity) -->
+<!-- ENTER animation: new Activity slides in from right -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:anim/accelerate_decelerate_interpolator">
 
@@ -9,8 +9,8 @@
         android:duration="300" />
 
     <alpha
-        android:fromAlpha="0.85"
+        android:fromAlpha="0.0"
         android:toAlpha="1.0"
-        android:duration="300" />
+        android:duration="150" />
 
 </set>

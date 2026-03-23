@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Instagram-style: return from left offset + brighten (previous activity restored) -->
+<!-- ENTER animation: returning Activity slides in from left -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:anim/accelerate_decelerate_interpolator">
 
     <translate
-        android:fromXDelta="-25%p"
+        android:fromXDelta="-100%p"
         android:toXDelta="0%p"
         android:duration="300" />
 
     <alpha
-        android:fromAlpha="0.7"
+        android:fromAlpha="0.0"
         android:toAlpha="1.0"
-        android:duration="300" />
+        android:duration="150" />
 
 </set>

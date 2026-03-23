@@ -13,6 +13,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:background="@color/bg_app">
 
     <!-- Header (Aesthetic-Usability: gradient bg, larger touch targets) -->
@@ -68,6 +69,8 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="-40dp"
+        android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingBottom="80dp"
         android:overScrollMode="never"
@@ -89,7 +92,6 @@
                 android:id="@+id/emergency_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-40dp"
                 android:background="@drawable/bg_emergency"
                 android:elevation="6dp"
                 android:gravity="center_vertical"
