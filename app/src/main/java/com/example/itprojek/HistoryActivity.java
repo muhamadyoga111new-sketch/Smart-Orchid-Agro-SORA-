@@ -3,9 +3,12 @@ package com.example.itprojek;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -24,14 +27,18 @@ public class HistoryActivity extends AppCompatActivity {
         hideSystemNavBar();
         applyStatusBarInsets();
 
-        // Back button — pop navigation (slide back)
+        // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Bottom Navigation — tab switch (crossfade, like Instagram)
+        // Bottom Navigation — tab switch (crossfade)
         LinearLayout navHome = findViewById(R.id.nav_home);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
+
+        applyScaleAnimation(navHome);
+        applyScaleAnimation(navNotifications);
+        applyScaleAnimation(navSettings);
 
         navHome.setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
@@ -63,6 +70,25 @@ public class HistoryActivity extends AppCompatActivity {
         });
     }
 
+    private void applyScaleAnimation(View view) {
+        view.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    Animation sd = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+                    sd.setFillAfter(true);
+                    v.startAnimation(sd);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    Animation su = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+                    su.setFillAfter(true);
+                    v.startAnimation(su);
+                    break;
+            }
+            return false;
+        });
+    }
+
     @Override
     public void finish() {
         super.finish();
@@ -72,9 +98,7 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemNavBar();
-        }
+        if (hasFocus) hideSystemNavBar();
     }
 
     private void hideSystemNavBar() {

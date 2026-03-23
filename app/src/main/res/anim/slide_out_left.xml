@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Instagram-style: current page shifts slightly left (parallax background) -->
+<!-- Instagram-style: parallax shift left + dim (exiting behind new activity) -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:interpolator="@android:anim/decelerate_interpolator">
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
 
     <translate
         android:fromXDelta="0%p"
         android:toXDelta="-25%p"
-        android:duration="250" />
+        android:duration="300" />
 
     <alpha
         android:fromAlpha="1.0"
-        android:toAlpha="0.9"
-        android:duration="250" />
+        android:toAlpha="0.7"
+        android:duration="300" />
 
 </set>

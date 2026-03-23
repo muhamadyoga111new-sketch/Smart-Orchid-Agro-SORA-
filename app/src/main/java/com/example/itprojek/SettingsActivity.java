@@ -3,9 +3,12 @@ package com.example.itprojek;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -23,14 +26,18 @@ public class SettingsActivity extends AppCompatActivity {
         hideSystemNavBar();
         applyStatusBarInsets();
 
-        // Back button — pop navigation (slide back)
+        // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Settings menu items — push navigation (slide, like Instagram opening a post)
+        // Settings menu items — push navigation (slide like Instagram detail)
         LinearLayout itemSchedule = findViewById(R.id.item_schedule);
         LinearLayout itemCalibration = findViewById(R.id.item_calibration);
         LinearLayout itemNotifAlert = findViewById(R.id.item_notif_alert);
+
+        applyScaleAnimation(itemSchedule);
+        applyScaleAnimation(itemCalibration);
+        applyScaleAnimation(itemNotifAlert);
 
         itemSchedule.setOnClickListener(v -> {
             startActivity(new Intent(this, ScheduleActivity.class));
@@ -47,10 +54,14 @@ public class SettingsActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // Bottom Navigation — tab switch (crossfade, like Instagram)
+        // Bottom Navigation — tab switch (crossfade)
         LinearLayout navHome = findViewById(R.id.nav_home);
         LinearLayout navHistory = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
+
+        applyScaleAnimation(navHome);
+        applyScaleAnimation(navHistory);
+        applyScaleAnimation(navNotifications);
 
         navHome.setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
@@ -79,6 +90,25 @@ public class SettingsActivity extends AppCompatActivity {
             v.setPadding(0, systemBars.top, 0, 0);
             v.requestLayout();
             return insets;
+        });
+    }
+
+    private void applyScaleAnimation(View view) {
+        view.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    Animation sd = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+                    sd.setFillAfter(true);
+                    v.startAnimation(sd);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    Animation su = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+                    su.setFillAfter(true);
+                    v.startAnimation(su);
+                    break;
+            }
+            return false;
         });
     }
 

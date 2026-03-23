@@ -3,9 +3,12 @@ package com.example.itprojek;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -18,6 +21,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class NotifAlertActivity extends AppCompatActivity {
 
+    private PrefManager pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,27 +30,42 @@ public class NotifAlertActivity extends AppCompatActivity {
         hideSystemNavBar();
         applyStatusBarInsets();
 
+        pref = new PrefManager(this);
+
         // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Switches with toast feedback
+        // === All 4 switches with persistence ===
+        // Pattern: restore value FIRST, then attach listener
+
         SwitchCompat switchDry = findViewById(R.id.switch_dry);
+        switchDry.setChecked(pref.getBoolean("NOTIF_DRY", true));
+        switchDry.setOnCheckedChangeListener((btn, checked) -> {
+            pref.saveBoolean("NOTIF_DRY", checked);
+            Toast.makeText(this, getString(R.string.alert_dry_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+        });
+
         SwitchCompat switchTank = findViewById(R.id.switch_tank);
+        switchTank.setChecked(pref.getBoolean("NOTIF_TANK", true));
+        switchTank.setOnCheckedChangeListener((btn, checked) -> {
+            pref.saveBoolean("NOTIF_TANK", checked);
+            Toast.makeText(this, getString(R.string.alert_tank_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+        });
+
         SwitchCompat switchMoist = findViewById(R.id.switch_moist);
+        switchMoist.setChecked(pref.getBoolean("NOTIF_MOIST", false));
+        switchMoist.setOnCheckedChangeListener((btn, checked) -> {
+            pref.saveBoolean("NOTIF_MOIST", checked);
+            Toast.makeText(this, getString(R.string.alert_moist_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+        });
+
         SwitchCompat switchTankAlarm = findViewById(R.id.switch_tank_alarm);
-
-        switchDry.setOnCheckedChangeListener((btn, checked) ->
-                Toast.makeText(this, getString(R.string.alert_dry_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show());
-
-        switchTank.setOnCheckedChangeListener((btn, checked) ->
-                Toast.makeText(this, getString(R.string.alert_tank_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show());
-
-        switchMoist.setOnCheckedChangeListener((btn, checked) ->
-                Toast.makeText(this, getString(R.string.alert_moist_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show());
-
-        switchTankAlarm.setOnCheckedChangeListener((btn, checked) ->
-                Toast.makeText(this, getString(R.string.alert_tank_alarm_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show());
+        switchTankAlarm.setChecked(pref.getBoolean("NOTIF_TANK_ALARM", false));
+        switchTankAlarm.setOnCheckedChangeListener((btn, checked) -> {
+            pref.saveBoolean("NOTIF_TANK_ALARM", checked);
+            Toast.makeText(this, getString(R.string.alert_tank_alarm_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+        });
 
         // Bottom Navigation — tab switch (crossfade)
         setupBottomNav();
@@ -68,6 +88,11 @@ public class NotifAlertActivity extends AppCompatActivity {
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
+        applyScaleAnimation(navHome);
+        applyScaleAnimation(navHistory);
+        applyScaleAnimation(navNotifications);
+        applyScaleAnimation(navSettings);
+
         navHome.setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -87,6 +112,25 @@ public class NotifAlertActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
+        });
+    }
+
+    private void applyScaleAnimation(View view) {
+        view.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    Animation sd = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+                    sd.setFillAfter(true);
+                    v.startAnimation(sd);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    Animation su = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+                    su.setFillAfter(true);
+                    v.startAnimation(su);
+                    break;
+            }
+            return false;
         });
     }
 
