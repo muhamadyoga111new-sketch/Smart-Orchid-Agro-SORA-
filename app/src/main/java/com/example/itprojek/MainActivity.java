@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
@@ -44,184 +43,113 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navView = findViewById(R.id.nav_view);
 
         // Set "Beranda" as checked (current page)
-        navView.setCheckedItem(R.id.drawer_home);
+        if (navView != null) {
+            navView.setCheckedItem(R.id.drawer_home);
+            navView.setNavigationItemSelectedListener(item -> {
+                int id = item.getItemId();
+                drawerLayout.closeDrawer(GravityCompat.START);
 
-        // Hamburger menu button opens drawer
+                drawerLayout.postDelayed(() -> {
+                    if (id == R.id.drawer_history) {
+                        startActivity(new Intent(this, HistoryActivity.class));
+                    } else if (id == R.id.drawer_notifications) {
+                        startActivity(new Intent(this, NotificationsActivity.class));
+                    } else if (id == R.id.drawer_settings) {
+                        startActivity(new Intent(this, SettingsActivity.class));
+                    }
+                }, 300);
+                return true;
+            });
+        }
+
+        // Hamburger menu button
         ImageView btnMenu = findViewById(R.id.btn_menu);
-        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        if (btnMenu != null) {
+            btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        }
 
-        // Handle drawer menu clicks
-        navView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            drawerLayout.closeDrawer(GravityCompat.START);
+        // Fix status bar overlap and header size
+        View mainView = findViewById(R.id.main);
+        if (mainView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+                v.setPadding(systemBars.left, 0, systemBars.right, 0);
 
-            // Delay navigation slightly so drawer animation finishes smoothly
-            drawerLayout.postDelayed(() -> {
-                if (id == R.id.drawer_home) {
-                    // Already on home, do nothing
-                } else if (id == R.id.drawer_history) {
-                    startActivity(new Intent(this, HistoryActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_notifications) {
-                    startActivity(new Intent(this, NotificationsActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_settings) {
-                    startActivity(new Intent(this, SettingsActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_about) {
-                    showAboutDialog();
+                View headerBg = findViewById(R.id.header_bg);
+                if (headerBg != null) {
+                    // Paksa tinggi header menjadi 60dp + status bar
+                    int baseDp = 60;
+                    int basePx = (int) (baseDp * getResources().getDisplayMetrics().density);
+                    headerBg.getLayoutParams().height = basePx + systemBars.top;
+                    headerBg.requestLayout();
                 }
-            }, 300);
+                return insets;
+            });
+        }
 
-            return true;
-        });
-
-        // Apply status bar insets to header content + resize header
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-            v.setPadding(systemBars.left, 0, systemBars.right, 0);
-
-            // Extend header_bg behind status bar — add status bar height to base 130dp
-            View headerBg = findViewById(R.id.header_bg);
-            if (headerBg != null) {
-                int baseDp = 130;
-                int basePx = (int) (baseDp * getResources().getDisplayMetrics().density);
-                headerBg.getLayoutParams().height = basePx + systemBars.top;
-                headerBg.requestLayout();
-            }
-
-            if (btnMenu != null) {
-                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnMenu.getLayoutParams()).topMargin = systemBars.top + 8;
-                btnMenu.requestLayout();
-            }
-            View btnNotifView = findViewById(R.id.btn_notification_top);
-            if (btnNotifView != null) {
-                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnNotifView.getLayoutParams()).topMargin = systemBars.top + 8;
-                btnNotifView.requestLayout();
-            }
-            return insets;
-        });
-
-        // Notification bell — push navigation (slide)
+        // Navigation bell
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
-        btnNotification.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        });
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> startActivity(new Intent(this, NotificationsActivity.class)));
+        }
 
-        // === Pump toggle with SharedPreferences ===
+        // === Pump toggle ===
         MaterialSwitch switchPump = findViewById(R.id.switch_pump);
         TextView tvPumpStatus = findViewById(R.id.tv_pump_status);
 
-        boolean pumpSaved = pref.getBoolean("STATUS_POMPA", false);
-        switchPump.setChecked(pumpSaved);
-        updatePumpStatusUI(tvPumpStatus, pumpSaved);
+        if (switchPump != null && tvPumpStatus != null) {
+            boolean pumpSaved = pref.getBoolean("STATUS_POMPA", false);
+            switchPump.setChecked(pumpSaved);
+            updatePumpStatusUI(tvPumpStatus, pumpSaved);
 
-        switchPump.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            pref.saveBoolean("STATUS_POMPA", isChecked);
-            updatePumpStatusUI(tvPumpStatus, isChecked);
-        });
+            switchPump.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                pref.saveBoolean("STATUS_POMPA", isChecked);
+                updatePumpStatusUI(tvPumpStatus, isChecked);
+            });
+        }
 
-        // Emergency Stop panel with scale animation
+        // Emergency Stop
         LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
-        applyScaleAnimation(emergencyPanel);
-        emergencyPanel.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.confirm_emergency_title))
-                    .setMessage(getString(R.string.confirm_emergency_msg))
-                    .setPositiveButton(getString(R.string.btn_yes), (dialog, which) -> {
-                        switchPump.setChecked(false);
-                        dialog.dismiss();
-                    })
-                    .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> dialog.dismiss())
-                    .setCancelable(true)
-                    .show();
-        });
+        if (emergencyPanel != null) {
+            emergencyPanel.setOnClickListener(v -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Konfirmasi")
+                        .setMessage("Matikan semua pompa?")
+                        .setPositiveButton("Ya", (dialog, which) -> {
+                            if (switchPump != null) switchPump.setChecked(false);
+                        })
+                        .setNegativeButton("Batal", null)
+                        .show();
+            });
+        }
 
-        // Bottom Navigation — tab switch (crossfade)
+        // Bottom Navigation
         LinearLayout navHistory = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
 
-        applyScaleAnimation(navHistory);
-        applyScaleAnimation(navNotifications);
-        applyScaleAnimation(navSettings);
-
-        navHistory.setOnClickListener(v -> {
-            startActivity(new Intent(this, HistoryActivity.class));
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        });
-
-        navNotifications.setOnClickListener(v -> {
-            startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        });
-
-        navSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        });
-    }
-
-    /**
-     * Shows the "Tentang Aplikasi" dialog
-     */
-    private void showAboutDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Tentang Aplikasi")
-                .setMessage("SORA - Smart Orchid Agro\n\n"
-                        + "Sistem Penyiraman Anggrek Otomatis\n"
-                        + "berbasis IoT.\n\n"
-                        + "Versi: 1.0.0\n"
-                        + "© 2024 SORA Team")
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .setCancelable(true)
-                .show();
+        if (navHistory != null) navHistory.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+        if (navNotifications != null) navNotifications.setOnClickListener(v -> startActivity(new Intent(this, NotificationsActivity.class)));
+        if (navSettings != null) navSettings.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
     }
 
     private void updatePumpStatusUI(TextView tvPumpStatus, boolean isOn) {
         if (isOn) {
-            tvPumpStatus.setText(getString(R.string.on));
+            tvPumpStatus.setText("ON");
             tvPumpStatus.setTextColor(Color.parseColor("#43A047"));
         } else {
-            tvPumpStatus.setText(getString(R.string.off));
+            tvPumpStatus.setText("OFF");
             tvPumpStatus.setTextColor(Color.parseColor("#EF5350"));
         }
     }
 
-    private void applyScaleAnimation(View view) {
-        view.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    Animation scaleDown = AnimationUtils.loadAnimation(this, R.anim.scale_down);
-                    scaleDown.setFillAfter(true);
-                    v.startAnimation(scaleDown);
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    Animation scaleUp = AnimationUtils.loadAnimation(this, R.anim.scale_up);
-                    scaleUp.setFillAfter(true);
-                    v.startAnimation(scaleUp);
-                    break;
-            }
-            return false;
-        });
-    }
-
     @Override
     public void onBackPressed() {
-        // Close drawer on back press if open, otherwise default behavior
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) hideSystemNavBar();
     }
 
     private void hideSystemNavBar() {
@@ -230,15 +158,8 @@ public class MainActivity extends AppCompatActivity {
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
                 controller.hide(WindowInsets.Type.navigationBars());
-                controller.setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
 }
