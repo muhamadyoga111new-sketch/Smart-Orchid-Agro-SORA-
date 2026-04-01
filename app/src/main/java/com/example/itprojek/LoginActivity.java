@@ -3,7 +3,6 @@ package com.example.itprojek;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -17,18 +16,20 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.Random;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // ── Kredensial demo (hardcoded – bisa diganti Room/DB nanti) ──
-    private static final String DEMO_EMAIL    = "admin@sora.com";
-    private static final String DEMO_PASSWORD = "sora1234";
+    // ── Firebase Auth ──
+    private FirebaseAuth mAuth;
 
     // ── CAPTCHA ──
     private int captchaAnswer = 0;
     private int captchaA, captchaB;
-    private static final int[] OPERATORS = { 0, 1, 2 }; // 0=+, 1=-, 2=×
+    private static final int[] OPERATORS = {0, 1, 2}; // 0=+, 1=-, 2=×
 
     // ── Views ──
     private EditText    etEmail, etPassword, etCaptchaAnswer;
@@ -36,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
     private ImageView   ivTogglePassword, btnRefreshCaptcha;
     private CardView    btnLogin;
     private View        progressLogin;
-    private PrefManager pref;
 
     private boolean passwordVisible = false;
 
@@ -44,9 +44,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Jika sudah login sebelumnya, langsung ke MainActivity
-        pref = new PrefManager(this);
-        if (pref.getBoolean("IS_LOGGED_IN", false)) {
+        // Inisialisasi Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // Jika sudah login (sesi aktif), langsung ke MainActivity
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
             goToMain();
             return;
         }
@@ -55,16 +58,16 @@ public class LoginActivity extends AppCompatActivity {
         hideSystemNavBar();
 
         // Bind views
-        etEmail          = findViewById(R.id.et_email);
-        etPassword       = findViewById(R.id.et_password);
-        etCaptchaAnswer  = findViewById(R.id.et_captcha_answer);
+        etEmail           = findViewById(R.id.et_email);
+        etPassword        = findViewById(R.id.et_password);
+        etCaptchaAnswer   = findViewById(R.id.et_captcha_answer);
         tvCaptchaQuestion = findViewById(R.id.tv_captcha_question);
-        tvCaptchaError   = findViewById(R.id.tv_captcha_error);
-        tvLoginText      = findViewById(R.id.tv_login_text);
-        ivTogglePassword = findViewById(R.id.iv_toggle_password);
+        tvCaptchaError    = findViewById(R.id.tv_captcha_error);
+        tvLoginText       = findViewById(R.id.tv_login_text);
+        ivTogglePassword  = findViewById(R.id.iv_toggle_password);
         btnRefreshCaptcha = findViewById(R.id.btn_refresh_captcha);
-        btnLogin         = findViewById(R.id.btn_login);
-        progressLogin    = findViewById(R.id.progress_login);
+        btnLogin          = findViewById(R.id.btn_login);
+        progressLogin     = findViewById(R.id.progress_login);
 
         // Generate CAPTCHA pertama
         generateCaptcha();
@@ -73,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         CardView cardLogin = findViewById(R.id.card_login);
         cardLogin.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_right));
 
-        // Toggle show / hide password
+        // Toggle show/hide password
         ivTogglePassword.setOnClickListener(v -> togglePassword());
 
         // Refresh CAPTCHA
@@ -89,14 +92,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // ─────────────────────────────────────────────
-    //  Logika Login
+    //  Logika Login dengan Firebase Auth
     // ─────────────────────────────────────────────
     private void attemptLogin() {
         String email    = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String captcha  = etCaptchaAnswer.getText().toString().trim();
 
-        // Validasi kosong
+        // Validasi email
         if (email.isEmpty()) {
             etEmail.setError("Email tidak boleh kosong");
             etEmail.requestFocus();
@@ -107,24 +110,25 @@ public class LoginActivity extends AppCompatActivity {
             etEmail.requestFocus();
             return;
         }
+
+        // Validasi password
         if (password.isEmpty()) {
             etPassword.setError("Password tidak boleh kosong");
             etPassword.requestFocus();
             return;
         }
+
+        // Validasi CAPTCHA
         if (captcha.isEmpty()) {
             etCaptchaAnswer.setError("Jawab CAPTCHA terlebih dahulu");
             etCaptchaAnswer.requestFocus();
             return;
         }
-
-        // Validasi CAPTCHA
         try {
             int userAnswer = Integer.parseInt(captcha);
             if (userAnswer != captchaAnswer) {
                 tvCaptchaError.setVisibility(View.VISIBLE);
-                etCaptchaAnswer.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.shake_interpolator));
-                generateCaptcha();          // refresh soal otomatis
+                generateCaptcha();
                 etCaptchaAnswer.setText("");
                 return;
             }
@@ -132,25 +136,28 @@ public class LoginActivity extends AppCompatActivity {
             tvCaptchaError.setVisibility(View.VISIBLE);
             return;
         }
-
         tvCaptchaError.setVisibility(View.GONE);
 
-        // Validasi email & password
-        if (!email.equalsIgnoreCase(DEMO_EMAIL) || !password.equals(DEMO_PASSWORD)) {
-            Toast.makeText(this, "Email atau password salah!", Toast.LENGTH_SHORT).show();
-            etPassword.setText("");
-            generateCaptcha();
-            etCaptchaAnswer.setText("");
-            return;
-        }
-
-        // ── LOGIN BERHASIL: tampilkan loading lalu navigasi ──
+        // ── Kirim ke Firebase Auth ──
         showLoading(true);
-        new Handler().postDelayed(() -> {
-            pref.saveBoolean("IS_LOGGED_IN", true);
-            pref.saveString("USER_EMAIL", email);
-            goToMain();
-        }, 1200);
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    showLoading(false);
+                    if (task.isSuccessful()) {
+                        // Login berhasil
+                        goToMain();
+                    } else {
+                        // Login gagal — tampilkan pesan error
+                        String errMsg = task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Login gagal. Periksa email dan password.";
+                        Toast.makeText(this, errMsg, Toast.LENGTH_LONG).show();
+                        // Reset CAPTCHA setelah gagal
+                        generateCaptcha();
+                        etCaptchaAnswer.setText("");
+                        etPassword.setText("");
+                    }
+                });
     }
 
     // ─────────────────────────────────────────────
@@ -158,28 +165,26 @@ public class LoginActivity extends AppCompatActivity {
     // ─────────────────────────────────────────────
     private void generateCaptcha() {
         Random random = new Random();
-        captchaA = random.nextInt(12) + 1;       // 1–12
+        captchaA = random.nextInt(12) + 1; // 1–12
         int op = OPERATORS[random.nextInt(OPERATORS.length)];
-
         String question;
         switch (op) {
             case 0: // penjumlahan
-                captchaB    = random.nextInt(10) + 1;
+                captchaB      = random.nextInt(10) + 1;
                 captchaAnswer = captchaA + captchaB;
-                question    = captchaA + "  +  " + captchaB + "  = ?";
+                question      = captchaA + "  +  " + captchaB + "  = ?";
                 break;
-            case 1: // pengurangan (pastikan hasil ≥ 0)
-                captchaB    = random.nextInt(captchaA) + 1;
+            case 1: // pengurangan (hasil ≥ 0)
+                captchaB      = random.nextInt(captchaA) + 1;
                 captchaAnswer = captchaA - captchaB;
-                question    = captchaA + "  −  " + captchaB + "  = ?";
+                question      = captchaA + "  −  " + captchaB + "  = ?";
                 break;
             default: // perkalian kecil
-                captchaB    = random.nextInt(5) + 1;   // 1–5
+                captchaB      = random.nextInt(5) + 1;
                 captchaAnswer = captchaA * captchaB;
-                question    = captchaA + "  ×  " + captchaB + "  = ?";
+                question      = captchaA + "  ×  " + captchaB + "  = ?";
                 break;
         }
-
         tvCaptchaQuestion.setText(question);
     }
 
@@ -204,7 +209,6 @@ public class LoginActivity extends AppCompatActivity {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             ivTogglePassword.setImageResource(android.R.drawable.ic_menu_view);
         }
-        // Pertahankan posisi cursor
         etPassword.setSelection(etPassword.getText().length());
     }
 
@@ -212,15 +216,9 @@ public class LoginActivity extends AppCompatActivity {
     //  Loading state tombol login
     // ─────────────────────────────────────────────
     private void showLoading(boolean loading) {
-        if (loading) {
-            tvLoginText.setVisibility(View.GONE);
-            progressLogin.setVisibility(View.VISIBLE);
-            btnLogin.setClickable(false);
-        } else {
-            tvLoginText.setVisibility(View.VISIBLE);
-            progressLogin.setVisibility(View.GONE);
-            btnLogin.setClickable(true);
-        }
+        tvLoginText.setVisibility(loading ? View.GONE    : View.VISIBLE);
+        progressLogin.setVisibility(loading ? View.VISIBLE : View.GONE);
+        btnLogin.setClickable(!loading);
     }
 
     // ─────────────────────────────────────────────

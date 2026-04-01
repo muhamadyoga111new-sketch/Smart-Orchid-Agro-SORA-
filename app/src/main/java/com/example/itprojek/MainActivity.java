@@ -24,11 +24,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-    private PrefManager pref;
-    private DrawerLayout drawerLayout;
+    // ── Device ID (sesuaikan dengan ID perangkat IoT Anda) ──
+    private static final String DEVICE_ID = "ANG-123456";
+
+    private PrefManager         pref;
+    private DrawerLayout        drawerLayout;
+    private FirebaseDataManager dataManager;
+    private MaterialSwitch      switchPump;
+    private TextView            tvPumpStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +46,19 @@ public class MainActivity extends AppCompatActivity {
         pref = new PrefManager(this);
         hideSystemNavBar();
 
+        // Cek sesi Firebase — jika tidak ada, kembali ke Login
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            goToLogin();
+            return;
+        }
+
+        // === Firebase Realtime Database ===
+        dataManager = new FirebaseDataManager(DEVICE_ID);
+
         // === Navigation Drawer Setup ===
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navView = findViewById(R.id.nav_view);
-
-        // Set "Beranda" as checked (current page)
         navView.setCheckedItem(R.id.drawer_home);
 
         // Hamburger menu button opens drawer
@@ -53,11 +69,9 @@ public class MainActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             drawerLayout.closeDrawer(GravityCompat.START);
-
-            // Delay navigation slightly so drawer animation finishes smoothly
             drawerLayout.postDelayed(() -> {
                 if (id == R.id.drawer_home) {
-                    // Already on home, do nothing
+                    // Already on home
                 } else if (id == R.id.drawer_history) {
                     startActivity(new Intent(this, HistoryActivity.class));
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -73,47 +87,46 @@ public class MainActivity extends AppCompatActivity {
                     logout();
                 }
             }, 300);
-
             return true;
         });
 
-        // Apply status bar insets to header content + resize header
+        // Apply status bar insets to header
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             v.setPadding(systemBars.left, 0, systemBars.right, 0);
 
-            // Extend header_bg behind status bar — add status bar height to base 130dp
             View headerBg = findViewById(R.id.header_bg);
             if (headerBg != null) {
-                int baseDp = 130;
-                int basePx = (int) (baseDp * getResources().getDisplayMetrics().density);
+                int basePx = (int) (130 * getResources().getDisplayMetrics().density);
                 headerBg.getLayoutParams().height = basePx + systemBars.top;
                 headerBg.requestLayout();
             }
-
             if (btnMenu != null) {
-                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnMenu.getLayoutParams()).topMargin = systemBars.top + 8;
+                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
+                        btnMenu.getLayoutParams()).topMargin = systemBars.top + 8;
                 btnMenu.requestLayout();
             }
             View btnNotifView = findViewById(R.id.btn_notification_top);
             if (btnNotifView != null) {
-                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnNotifView.getLayoutParams()).topMargin = systemBars.top + 8;
+                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
+                        btnNotifView.getLayoutParams()).topMargin = systemBars.top + 8;
                 btnNotifView.requestLayout();
             }
             return insets;
         });
 
-        // Notification bell — push navigation (slide)
+        // Notification bell
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
         btnNotification.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // === Pump toggle with SharedPreferences ===
-        MaterialSwitch switchPump = findViewById(R.id.switch_pump);
-        TextView tvPumpStatus = findViewById(R.id.tv_pump_status);
+        // === Pump toggle — terhubung ke Firebase Realtime Database ===
+        switchPump   = findViewById(R.id.switch_pump);
+        tvPumpStatus = findViewById(R.id.tv_pump_status);
 
+        // Nilai awal dari SharedPreferences (sementara sebelum Firebase terbaca)
         boolean pumpSaved = pref.getBoolean("STATUS_POMPA", false);
         switchPump.setChecked(pumpSaved);
         updatePumpStatusUI(tvPumpStatus, pumpSaved);
@@ -121,9 +134,42 @@ public class MainActivity extends AppCompatActivity {
         switchPump.setOnCheckedChangeListener((buttonView, isChecked) -> {
             pref.saveBoolean("STATUS_POMPA", isChecked);
             updatePumpStatusUI(tvPumpStatus, isChecked);
+            // Tulis perubahan pompa ke Firebase (dibaca IoT device)
+            dataManager.setPumpStatus(isChecked);
         });
 
-        // Emergency Stop panel with scale animation
+        // === Sensor data real-time dari Firebase ===
+        dataManager.listenSensorData(new FirebaseDataManager.SensorListener() {
+            @Override
+            public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
+                // Update UI sensor kelembapan tanah
+                TextView tvMoistureValue = findViewById(R.id.tv_moisture_value);
+                if (tvMoistureValue != null) {
+                    tvMoistureValue.setText(soilMoisture + "%");
+                }
+
+                // Update UI level air
+                TextView tvWaterValue = findViewById(R.id.tv_water_value);
+                if (tvWaterValue != null) {
+                    tvWaterValue.setText(waterLevel + "%");
+                }
+
+                // Sync status pompa dari Firebase ke UI
+                if (switchPump.isChecked() != pumpStatus) {
+                    switchPump.setChecked(pumpStatus);
+                    pref.saveBoolean("STATUS_POMPA", pumpStatus);
+                    updatePumpStatusUI(tvPumpStatus, pumpStatus);
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // Tampilkan error ringan tanpa crash
+                android.util.Log.w("SORA-DB", "Realtime DB error: " + errorMessage);
+            }
+        });
+
+        // Emergency Stop panel
         LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
         applyScaleAnimation(emergencyPanel);
         emergencyPanel.setOnClickListener(v -> {
@@ -132,17 +178,18 @@ public class MainActivity extends AppCompatActivity {
                     .setMessage(getString(R.string.confirm_emergency_msg))
                     .setPositiveButton(getString(R.string.btn_yes), (dialog, which) -> {
                         switchPump.setChecked(false);
+                        dataManager.setPumpStatus(false);
                         dialog.dismiss();
                     })
-                    .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(getString(R.string.btn_cancel), (d, w) -> d.dismiss())
                     .setCancelable(true)
                     .show();
         });
 
-        // Bottom Navigation — tab switch (crossfade)
-        LinearLayout navHistory = findViewById(R.id.nav_history);
+        // Bottom Navigation
+        LinearLayout navHistory       = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
-        LinearLayout navSettings = findViewById(R.id.nav_settings);
+        LinearLayout navSettings      = findViewById(R.id.nav_settings);
 
         applyScaleAnimation(navHistory);
         applyScaleAnimation(navNotifications);
@@ -152,19 +199,26 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, HistoryActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
-
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
-
         navSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
     }
 
-    /** Shows the "Tentang Aplikasi" dialog */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Hentikan listener Realtime Database agar tidak memory leak
+        if (dataManager != null) dataManager.stopListening();
+    }
+
+    // ─────────────────────────────────────────────
+    //  Shows the "Tentang Aplikasi" dialog
+    // ─────────────────────────────────────────────
     private void showAboutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Tentang Aplikasi")
@@ -178,33 +232,37 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    /** Konfirmasi logout lalu hapus sesi dan kembali ke LoginActivity */
+    // ─────────────────────────────────────────────
+    //  Logout via Firebase Auth
+    // ─────────────────────────────────────────────
     private void logout() {
         new AlertDialog.Builder(this)
                 .setTitle("Keluar")
                 .setMessage("Apakah Anda yakin ingin keluar dari akun?")
                 .setPositiveButton("Keluar", (dialog, which) -> {
-                    pref.saveBoolean("IS_LOGGED_IN", false);
-                    pref.remove("USER_EMAIL");
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    finish();
+                    if (dataManager != null) dataManager.stopListening();
+                    FirebaseAuth.getInstance().signOut();
+                    goToLogin();
                 })
                 .setNegativeButton("Batal", (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }
 
+    // ─────────────────────────────────────────────
+    //  Navigasi ke LoginActivity, bersihkan back stack
+    // ─────────────────────────────────────────────
+    private void goToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
+    }
+
     private void updatePumpStatusUI(TextView tvPumpStatus, boolean isOn) {
-        if (isOn) {
-            tvPumpStatus.setText(getString(R.string.on));
-            tvPumpStatus.setTextColor(Color.parseColor("#43A047"));
-        } else {
-            tvPumpStatus.setText(getString(R.string.off));
-            tvPumpStatus.setTextColor(Color.parseColor("#EF5350"));
-        }
+        tvPumpStatus.setText(isOn ? getString(R.string.on) : getString(R.string.off));
+        tvPumpStatus.setTextColor(Color.parseColor(isOn ? "#43A047" : "#EF5350"));
     }
 
     private void applyScaleAnimation(View view) {
