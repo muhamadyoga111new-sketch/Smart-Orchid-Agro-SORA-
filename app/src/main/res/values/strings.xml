@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IT PROJEK</string>
+    <string name="app_name">SORA</string>
     <string name="title_dashboard">Sistem Penyiraman Anggrek</string>
     <string name="emergency_stop">Emergency Stop</string>
     <string name="soil_moisture">Kelembapan Tanah</string>
@@ -69,6 +69,7 @@
     <string name="day_kam">Kam</string>
     <string name="day_jum">Jum</string>
     <string name="day_sab">Sab</string>
+    <string name="day_min">Min</string>
     <string name="durasi">Durasi</string>
     <string name="durasi_value">10 menit</string>
     <string name="min_5">5</string>

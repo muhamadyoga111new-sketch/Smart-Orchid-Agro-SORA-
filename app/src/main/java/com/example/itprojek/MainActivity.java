@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
-
 
         // Apply status bar insets to header content + resize header
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -166,9 +164,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Shows the "Tentang Aplikasi" dialog
-     */
+    /** Shows the "Tentang Aplikasi" dialog */
     private void showAboutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Tentang Aplikasi")
@@ -182,9 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Konfirmasi logout lalu hapus sesi dan kembali ke LoginActivity
-     */
+    /** Konfirmasi logout lalu hapus sesi dan kembali ke LoginActivity */
     private void logout() {
         new AlertDialog.Builder(this)
                 .setTitle("Keluar")
@@ -202,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(true)
                 .show();
     }
-
 
     private void updatePumpStatusUI(TextView tvPumpStatus, boolean isOn) {
         if (isOn) {
@@ -235,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Close drawer on back press if open, otherwise default behavior
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {

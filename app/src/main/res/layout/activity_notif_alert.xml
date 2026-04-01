@@ -55,7 +55,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Description (Miller's Law: clear context) -->
+            <!-- Description -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                 android:lineSpacingExtra="4dp"
                 android:layout_marginBottom="20dp" />
 
-            <!-- Alert 1: Peringatan Tanah Kering (Law of Common Region: card per alert) -->
+            <!-- Alert 1: Peringatan Tanah Kering -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,7 +87,6 @@
                         android:gravity="center_vertical"
                         android:minHeight="48dp">
 
-                        <!-- Icon indicator (Law of Similarity: red = warning) -->
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -111,7 +110,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="@color/white"
-                            app:trackTint="@color/nav_active" />
+                            app:trackTint="@color/switch_track_custom" />
                     </LinearLayout>
 
                     <TextView
@@ -172,7 +171,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="@color/white"
-                            app:trackTint="@color/nav_active" />
+                            app:trackTint="@color/switch_track_custom" />
                     </LinearLayout>
 
                     <TextView
@@ -210,7 +209,6 @@
                         android:gravity="center_vertical"
                         android:minHeight="48dp">
 
-                        <!-- Icon: green = success/info -->
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -234,7 +232,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="@color/white"
-                            app:trackTint="@color/nav_active" />
+                            app:trackTint="@color/switch_track_custom" />
                     </LinearLayout>
 
                     <TextView
@@ -271,7 +269,6 @@
                         android:gravity="center_vertical"
                         android:minHeight="48dp">
 
-                        <!-- Icon: blue = info -->
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
@@ -295,7 +292,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="@color/white"
-                            app:trackTint="@color/nav_active" />
+                            app:trackTint="@color/switch_track_custom" />
                     </LinearLayout>
 
                     <TextView
@@ -327,8 +324,8 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_active" android:contentDescription="@string/beranda" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_active" android:textSize="11sp" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
         <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
             <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
@@ -339,8 +336,8 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
         </LinearLayout>
         <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" app:tint="@color/nav_inactive" android:contentDescription="@string/pengaturan" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" app:tint="@color/nav_active" android:contentDescription="@string/pengaturan" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_active" android:textSize="11sp" android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
