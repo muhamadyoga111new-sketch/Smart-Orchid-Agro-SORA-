@@ -70,11 +70,14 @@ public class MainActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else if (id == R.id.drawer_about) {
                     showAboutDialog();
+                } else if (id == R.id.drawer_logout) {
+                    logout();
                 }
             }, 300);
 
             return true;
         });
+
 
         // Apply status bar insets to header content + resize header
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -178,6 +181,28 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(true)
                 .show();
     }
+
+    /**
+     * Konfirmasi logout lalu hapus sesi dan kembali ke LoginActivity
+     */
+    private void logout() {
+        new AlertDialog.Builder(this)
+                .setTitle("Keluar")
+                .setMessage("Apakah Anda yakin ingin keluar dari akun?")
+                .setPositiveButton("Keluar", (dialog, which) -> {
+                    pref.saveBoolean("IS_LOGGED_IN", false);
+                    pref.remove("USER_EMAIL");
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    finish();
+                })
+                .setNegativeButton("Batal", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
+    }
+
 
     private void updatePumpStatusUI(TextView tvPumpStatus, boolean isOn) {
         if (isOn) {

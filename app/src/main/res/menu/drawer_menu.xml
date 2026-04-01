@@ -33,6 +33,11 @@
             android:icon="@drawable/ic_info"
             android:title="Tentang Aplikasi" />
 
+        <item
+            android:id="@+id/drawer_logout"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="Keluar" />
+
     </group>
 
 </menu>
