@@ -97,21 +97,35 @@ public class MainActivity extends AppCompatActivity {
 
             View headerBg = findViewById(R.id.header_bg);
             if (headerBg != null) {
-                int basePx = (int) (130 * getResources().getDisplayMetrics().density);
+                // Return header height to standard 60dp + status bar height
+                int basePx = (int) (60 * getResources().getDisplayMetrics().density);
                 headerBg.getLayoutParams().height = basePx + systemBars.top;
                 headerBg.requestLayout();
             }
-            if (btnMenu != null) {
+
+            // Align all three items (menu, notification, and title) down by status bar height
+            // so they are perfectly centered in the visible part of the header
+            View btnMenuRef = findViewById(R.id.btn_menu);
+            if (btnMenuRef != null) {
                 ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
-                        btnMenu.getLayoutParams()).topMargin = systemBars.top + 8;
-                btnMenu.requestLayout();
+                        btnMenuRef.getLayoutParams()).topMargin = systemBars.top;
+                btnMenuRef.requestLayout();
             }
+
             View btnNotifView = findViewById(R.id.btn_notification_top);
             if (btnNotifView != null) {
                 ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
-                        btnNotifView.getLayoutParams()).topMargin = systemBars.top + 8;
+                        btnNotifView.getLayoutParams()).topMargin = systemBars.top;
                 btnNotifView.requestLayout();
             }
+
+            View tvTitle = findViewById(R.id.tv_title);
+            if (tvTitle != null) {
+                ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
+                        tvTitle.getLayoutParams()).topMargin = systemBars.top;
+                tvTitle.requestLayout();
+            }
+
             return insets;
         });
 

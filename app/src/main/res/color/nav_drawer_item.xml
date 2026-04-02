@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Drawer menu item color: green when checked/active, dark gray otherwise -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="#388E3C" android:state_checked="true" />
     <item android:color="#616161" android:state_checked="false" />

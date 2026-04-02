@@ -39,7 +39,7 @@ public class FirebaseDataManager {
 
     // ── Konstanta path ──────────────────────────────────────────────
     private static final String DB_URL =
-            "https://sora-app-default-rtdb.asia-southeast1.firebasedatabase.app/";
+            "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
     private static final String PATH_SENSORS = "sensors";
 

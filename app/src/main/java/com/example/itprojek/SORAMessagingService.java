@@ -126,7 +126,7 @@ public class SORAMessagingService extends FirebaseMessagingService {
         if (uid == null) return;
 
         com.google.firebase.database.FirebaseDatabase
-                .getInstance("https://sora-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("users")
                 .child(uid)
                 .child("fcmToken")
