@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.drawer_settings) {
                     startActivity(new Intent(this, SettingsActivity.class));
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else if (id == R.id.drawer_profile) {
+                    startActivity(new Intent(this, ProfileActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else if (id == R.id.drawer_about) {
                     showAboutDialog();
                 } else if (id == R.id.drawer_logout) {

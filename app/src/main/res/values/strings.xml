@@ -17,6 +17,8 @@
     <string name="riwayat">Riwayat</string>
     <string name="notifikasi">Notifikasi</string>
     <string name="pengaturan">Pengaturan</string>
+    <string name="profil_pengguna">Profil Pengguna</string>
+
 
     <!-- Riwayat -->
     <string name="title_history">Riwayat Penyiraman</string>

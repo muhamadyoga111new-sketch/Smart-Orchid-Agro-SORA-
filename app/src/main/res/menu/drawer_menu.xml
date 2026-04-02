@@ -23,6 +23,11 @@
             android:icon="@drawable/ic_settings"
             android:title="Pengaturan" />
 
+        <item
+            android:id="@+id/drawer_profile"
+            android:icon="@drawable/ic_profile"
+            android:title="@string/profil_pengguna" />
+
     </group>
 
     <!-- Divider line automatically appears between groups -->
