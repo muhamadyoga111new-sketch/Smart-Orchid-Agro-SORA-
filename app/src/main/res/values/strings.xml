@@ -64,6 +64,9 @@
 
     <!-- Jadwal Penyiraman -->
     <string name="auto_watering">Penyiraman Otomatis</string>
+    <string name="auto_watering_on">Penyiraman otomatis aktif</string>
+    <string name="auto_watering_off">Penyiraman otomatis tidak aktif</string>
+    <string name="auto_watering_status">Penyiraman Otomatis: %s</string>
     <string name="default_time">07:00</string>
     <string name="day_sen">Sen</string>
     <string name="day_sel">Sel</string>
@@ -73,7 +76,8 @@
     <string name="day_sab">Sab</string>
     <string name="day_min">Min</string>
     <string name="durasi">Durasi</string>
-    <string name="durasi_value">10 menit</string>
+    <string name="durasi_value">%d menit</string>
+    <string name="durasi_value_format">%d menit</string>
     <string name="min_5">5</string>
     <string name="max_30">30</string>
 
@@ -92,16 +96,28 @@
     <string name="persen_70">70%</string>
     <string name="persen_90">90%</string>
 
-    <!-- Notifikasi dan Peringatan -->
-    <string name="notif_alert_desc">Atur pemberitahuan dan peringatan sistem</string>
-    <string name="alert_dry_title">Peringatan Tanah Kering</string>
-    <string name="alert_dry_desc">Tanah, kelembapan sangat rendah. Segera lakukan penyiraman.</string>
-    <string name="alert_tank_title">Peringatan Air Tangki Habis</string>
-    <string name="alert_tank_desc">Tanah, segera merekomendasikan tanah ulang tangki agar terpantau.</string>
-    <string name="alert_moist_title">Notifikasi Tanah Lembap</string>
-    <string name="alert_moist_desc">Tanah sudah cukup kering, normal. Cukup oleh lembap.</string>
-    <string name="alert_tank_alarm_title">Alarm Air Tangki Habis</string>
-    <string name="alert_tank_alarm_desc">Jika level air tangki kosong, siraman otomatis akan dihentikan untuk mencegah kerusakan pompa.</string>
+    <!-- Notifikasi dan Peringatan (Refactored) -->
+    <string name="notif_alert_desc">Atur pemberitahuan dan peringatan sistem secara spesifik.</string>
+
+    <string name="category_warning">Peringatan Kondisi</string>
+    <string name="alert_dry_title">Tanah Kering</string>
+    <string name="alert_dry_desc">Dapatkan notifikasi saat tanah kering agar segera dilakukan penyiraman.</string>
+
+    <string name="category_critical">Keadaan Darurat</string>
+    <string name="alert_tank_title">Air Tangki Habis</string>
+    <string name="alert_tank_desc">Dapatkan peringatan saat air tangki habis untuk segera diisi ulang.</string>
+
+    <string name="category_info">Informasi Sistem</string>
+    <string name="alert_moist_title">Tanah Lembap</string>
+    <string name="alert_moist_desc">Notifikasi saat kondisi tanah sudah kembali normal atau lembap.</string>
+
+    <string name="category_alarm">Keamanan Pompa</string>
+    <string name="alert_tank_alarm_title">Proteksi Pompa Air</string>
+    <string name="alert_tank_alarm_desc">Hentikan penyiraman otomatis saat air habis untuk mencegah kerusakan pompa.</string>
+
+    <string name="notif_enabled">%s diaktifkan</string>
+    <string name="notif_disabled">%s dimatikan</string>
+
     <string name="saved_toast">Pengaturan disimpan!</string>
 
     <!-- Laws of UX additions -->

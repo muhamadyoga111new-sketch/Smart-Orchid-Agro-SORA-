@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.animation.Animation;
@@ -16,24 +17,28 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.Locale;
 
 public class ScheduleActivity extends AppCompatActivity {
 
     private PrefManager pref;
-    private boolean[] selectedDays = new boolean[6];
+    private final boolean[] selectedDays = new boolean[6];
     private static final String[] DAY_KEYS = {
             "JADWAL_SEN", "JADWAL_SEL", "JADWAL_RAB",
             "JADWAL_KAM", "JADWAL_JUM", "JADWAL_SAB"
     };
+
+    private LinearLayout layoutContent;
+    private TextView tvSwitchStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,54 +48,56 @@ public class ScheduleActivity extends AppCompatActivity {
         applyStatusBarInsets();
 
         pref = new PrefManager(this);
+        layoutContent = findViewById(R.id.layoutContent);
+        tvSwitchStatus = findViewById(R.id.tv_switch_status);
 
         // Back button
-        ImageView btnBack = findViewById(R.id.btn_back);
+        final ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // === Auto watering switch with persistence ===
-        SwitchCompat switchAuto = findViewById(R.id.switch_auto_watering);
-        // Restore FIRST
-        boolean autoSaved = pref.getBoolean("AUTO_WATERING", false);
+        // === Auto watering switch with persistence & state management ===
+        final MaterialSwitch switchAuto = findViewById(R.id.switch_auto_watering);
+        final boolean autoSaved = pref.getBoolean("AUTO_WATERING", true);
+        
+        // Initial state
         switchAuto.setChecked(autoSaved);
-        // THEN attach listener
+        updateUIState(autoSaved);
+
         switchAuto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             pref.saveBoolean("AUTO_WATERING", isChecked);
-            Toast.makeText(this, "Penyiraman Otomatis: " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+            updateUIState(isChecked);
+            final String status = isChecked ? getString(R.string.on) : getString(R.string.off);
+            Toast.makeText(this, getString(R.string.auto_watering_status, status), Toast.LENGTH_SHORT).show();
         });
 
         // === Time picker with persistence ===
-        TextView tvTime = findViewById(R.id.tv_time);
-        String savedTime = pref.getString("JADWAL_WAKTU", "07:00");
+        final TextView tvTime = findViewById(R.id.tv_time);
+        final String savedTime = pref.getString("JADWAL_WAKTU", "07:00");
         tvTime.setText(savedTime);
 
-        LinearLayout layoutTime = findViewById(R.id.layout_time);
+        final LinearLayout layoutTime = findViewById(R.id.layout_time);
         layoutTime.setOnClickListener(v -> {
-            // Parse saved time for initial picker values
-            String currentTime = tvTime.getText().toString();
+            final String currentTime = tvTime.getText().toString();
             int hour = 7, min = 0;
             try {
-                String[] parts = currentTime.split(":");
+                final String[] parts = currentTime.split(":");
                 hour = Integer.parseInt(parts[0]);
                 min = Integer.parseInt(parts[1]);
             } catch (Exception ignored) {}
 
-            int finalHour = hour;
-            int finalMin = min;
-            TimePickerDialog picker = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-                String timeStr = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
+            final TimePickerDialog picker = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+                final String timeStr = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
                 tvTime.setText(timeStr);
                 pref.saveString("JADWAL_WAKTU", timeStr);
-            }, finalHour, finalMin, true);
+            }, hour, min, true);
             picker.show();
         });
 
         // === Day selectors with persistence ===
-        int[] dayIds = {R.id.day_sen, R.id.day_sel, R.id.day_rab, R.id.day_kam, R.id.day_jum, R.id.day_sab};
+        final int[] dayIds = {R.id.day_sen, R.id.day_sel, R.id.day_rab, R.id.day_kam, R.id.day_jum, R.id.day_sab};
         for (int i = 0; i < dayIds.length; i++) {
-            TextView dayView = findViewById(dayIds[i]);
+            final TextView dayView = findViewById(dayIds[i]);
             final int index = i;
-            // Restore saved day selection (default: all true)
             selectedDays[index] = pref.getBoolean(DAY_KEYS[index], true);
             updateDayStyle(dayView, selectedDays[index]);
             dayView.setOnClickListener(v -> {
@@ -101,45 +108,61 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         // === Duration seekbar with persistence ===
-        TextView tvDurasi = findViewById(R.id.tv_durasi_value);
-        SeekBar seekBarDurasi = findViewById(R.id.seekbar_durasi);
-        // Restore saved duration (default: 10 menit → progress = 5, karena value = progress + 5)
-        int savedDurasi = pref.getInt("JADWAL_DURASI", 5); // progress value
+        final TextView tvDurasi = findViewById(R.id.tv_durasi_value);
+        final SeekBar seekBarDurasi = findViewById(R.id.seekbar_durasi);
+        final int savedDurasi = pref.getInt("JADWAL_DURASI", 5);
         seekBarDurasi.setProgress(savedDurasi);
-        tvDurasi.setText((savedDurasi + 5) + " menit");
+        tvDurasi.setText(getString(R.string.durasi_value_format, savedDurasi + 5));
 
         seekBarDurasi.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = progress + 5;
-                tvDurasi.setText(value + " menit");
+                final int value = progress + 5;
+                tvDurasi.setText(getString(R.string.durasi_value_format, value));
                 if (fromUser) {
                     pref.saveInt("JADWAL_DURASI", progress);
                 }
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                // Save final value when user lifts finger
                 pref.saveInt("JADWAL_DURASI", seekBar.getProgress());
             }
         });
 
-        // Kalibrasi button — push navigation (slide)
-        MaterialButton btnKalibrasi = findViewById(R.id.btn_kalibrasi);
+        // Kalibrasi button
+        final MaterialButton btnKalibrasi = findViewById(R.id.btn_kalibrasi);
         applyScaleAnimation(btnKalibrasi);
         btnKalibrasi.setOnClickListener(v -> {
             startActivity(new Intent(this, CalibrationActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // Bottom Navigation — tab switch (crossfade)
         setupBottomNav();
     }
 
+    private void updateUIState(boolean isChecked) {
+        layoutContent.setAlpha(isChecked ? 1.0f : 0.5f);
+        setEnabledRecursive(layoutContent, isChecked);
+        tvSwitchStatus.setText(isChecked ? getString(R.string.auto_watering_on) : getString(R.string.auto_watering_off));
+    }
+
+    private void setEnabledRecursive(@NonNull View view, boolean enabled) {
+        view.setEnabled(enabled);
+        if (view instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                final View child = group.getChildAt(i);
+                if (child != null) {
+                    setEnabledRecursive(child, enabled);
+                }
+            }
+        }
+    }
+
     private void applyStatusBarInsets() {
-        View headerBg = findViewById(R.id.header_bg);
+        final View headerBg = findViewById(R.id.header_bg);
         ViewCompat.setOnApplyWindowInsetsListener(headerBg, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            final Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             v.getLayoutParams().height = (int) (60 * getResources().getDisplayMetrics().density) + systemBars.top;
             v.setPadding(0, systemBars.top, 0, 0);
             v.requestLayout();
@@ -147,7 +170,7 @@ public class ScheduleActivity extends AppCompatActivity {
         });
     }
 
-    private void updateDayStyle(TextView dayView, boolean selected) {
+    private void updateDayStyle(@NonNull TextView dayView, boolean selected) {
         if (selected) {
             dayView.setBackgroundResource(R.drawable.bg_day_selected);
             dayView.setTextColor(getResources().getColor(R.color.white, null));
@@ -158,10 +181,10 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     private void setupBottomNav() {
-        LinearLayout navHome = findViewById(R.id.nav_home);
-        LinearLayout navHistory = findViewById(R.id.nav_history);
-        LinearLayout navNotifications = findViewById(R.id.nav_notifications);
-        LinearLayout navSettings = findViewById(R.id.nav_settings);
+        final LinearLayout navHome = findViewById(R.id.nav_home);
+        final LinearLayout navHistory = findViewById(R.id.nav_history);
+        final LinearLayout navNotifications = findViewById(R.id.nav_notifications);
+        final LinearLayout navSettings = findViewById(R.id.nav_settings);
 
         applyScaleAnimation(navHome);
         applyScaleAnimation(navHistory);
@@ -190,17 +213,18 @@ public class ScheduleActivity extends AppCompatActivity {
         });
     }
 
-    private void applyScaleAnimation(View view) {
+    private void applyScaleAnimation(@NonNull View view) {
         view.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    Animation sd = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+                    final Animation sd = AnimationUtils.loadAnimation(this, R.anim.scale_down);
                     sd.setFillAfter(true);
                     v.startAnimation(sd);
                     break;
                 case MotionEvent.ACTION_UP:
+                    v.performClick();
                 case MotionEvent.ACTION_CANCEL:
-                    Animation su = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+                    final Animation su = AnimationUtils.loadAnimation(this, R.anim.scale_up);
                     su.setFillAfter(true);
                     v.startAnimation(su);
                     break;
@@ -224,7 +248,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private void hideSystemNavBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController controller = getWindow().getInsetsController();
+            final WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
                 controller.hide(WindowInsets.Type.navigationBars());
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);

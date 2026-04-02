@@ -75,7 +75,7 @@ public class CalibrationActivity extends AppCompatActivity {
             }
         });
 
-        // === Lembap seekbar with persistence ===
+        // === Lembap seekbar with persistence ===v v dfnj m
         SeekBar seekLembap = findViewById(R.id.seekbar_lembap);
         TextView tvLembap = findViewById(R.id.tv_lembap_value);
         int savedLembap = pref.getInt("KALIBRASI_LEMBAP", 80);

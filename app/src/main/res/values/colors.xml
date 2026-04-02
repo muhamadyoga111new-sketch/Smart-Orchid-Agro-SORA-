@@ -18,25 +18,28 @@
     <color name="water_blue">#42A5F5</color>
     <color name="water_tank_bg">#E1F5FE</color>
     <color name="switch_on">#4CAF50</color>
-    <color name="switch_off">#EF5350</color>
+    <color name="switch_off">#BDBDBD</color> <!-- Updated from red to grey -->
     <color name="nav_active">#4CAF50</color>
     <color name="nav_inactive">#B0BEC5</color>
     <color name="card_stroke">#ECEFF1</color>
     <color name="divider">#F1F1F1</color>
-    <color name="notif_warning">#EF5350</color>
-    <color name="notif_success">#66BB6A</color>
-    <color name="notif_info">#42A5F5</color>
-    <color name="day_unselected_text">#607D8B</color>
-    <color name="day_selected_bg">#4CAF50</color>
-    <color name="day_unselected_bg">#FFFFFF</color>
+    <color name="notif_warning">#FFB300</color> <!-- Updated to Amber for Warning -->
+    <color name="notif_success">#4CAF50</color>
+    <color name="notif_info">#2196F3</color>
+    <color name="notif_critical">#E53935</color> <!-- Red for Critical -->
 
-    <!-- Missing colors fixed -->
+    <!-- Missing colors found in drawables -->
     <color name="card_bg">#FFFFFF</color>
-    <color name="emergency_bg">#F1F8E9</color>
-    <color name="emergency_border">#C8E6C9</color>
+    <color name="emergency_bg">#FDECEA</color>
+    <color name="emergency_border">#EF5350</color>
     <color name="notif_info_bg">#E3F2FD</color>
     <color name="notif_success_bg">#E8F5E9</color>
-    <color name="notif_warning_bg">#FFEBEE</color>
+    <color name="notif_warning_bg">#FFF8E1</color>
     <color name="green_emergency_icon">#4CAF50</color>
     <color name="ripple_color">#20000000</color>
+
+    <!-- Schedule Day Selector Colors -->
+    <color name="day_selected_bg">#4CAF50</color>
+    <color name="day_unselected_bg">#FFFFFF</color>
+    <color name="day_unselected_text">#607D8B</color>
 </resources>

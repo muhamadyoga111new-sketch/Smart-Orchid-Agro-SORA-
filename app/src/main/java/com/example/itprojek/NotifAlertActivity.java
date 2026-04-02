@@ -14,10 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 public class NotifAlertActivity extends AppCompatActivity {
 
@@ -36,39 +37,35 @@ public class NotifAlertActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // === All 4 switches with persistence ===
-        // Pattern: restore value FIRST, then attach listener
+        // === 1. Peringatan Tanah Kering (Warning) ===
+        MaterialSwitch switchDry = findViewById(R.id.switch_dry);
+        setupSwitch(switchDry, "NOTIF_DRY", true, getString(R.string.alert_dry_title));
 
-        SwitchCompat switchDry = findViewById(R.id.switch_dry);
-        switchDry.setChecked(pref.getBoolean("NOTIF_DRY", true));
-        switchDry.setOnCheckedChangeListener((btn, checked) -> {
-            pref.saveBoolean("NOTIF_DRY", checked);
-            Toast.makeText(this, getString(R.string.alert_dry_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-        });
+        // === 2. Peringatan Air Tangki Habis (Critical) ===
+        MaterialSwitch switchTank = findViewById(R.id.switch_tank);
+        setupSwitch(switchTank, "NOTIF_TANK", true, getString(R.string.alert_tank_title));
 
-        SwitchCompat switchTank = findViewById(R.id.switch_tank);
-        switchTank.setChecked(pref.getBoolean("NOTIF_TANK", true));
-        switchTank.setOnCheckedChangeListener((btn, checked) -> {
-            pref.saveBoolean("NOTIF_TANK", checked);
-            Toast.makeText(this, getString(R.string.alert_tank_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-        });
+        // === 3. Notifikasi Tanah Lembap (Info) ===
+        MaterialSwitch switchMoist = findViewById(R.id.switch_moist);
+        setupSwitch(switchMoist, "NOTIF_MOIST", false, getString(R.string.alert_moist_title));
 
-        SwitchCompat switchMoist = findViewById(R.id.switch_moist);
-        switchMoist.setChecked(pref.getBoolean("NOTIF_MOIST", false));
-        switchMoist.setOnCheckedChangeListener((btn, checked) -> {
-            pref.saveBoolean("NOTIF_MOIST", checked);
-            Toast.makeText(this, getString(R.string.alert_moist_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-        });
+        // === 4. Alarm Air Tangki Habis (Alarm) ===
+        MaterialSwitch switchTankAlarm = findViewById(R.id.switch_tank_alarm);
+        setupSwitch(switchTankAlarm, "NOTIF_TANK_ALARM", true, getString(R.string.alert_tank_alarm_title));
 
-        SwitchCompat switchTankAlarm = findViewById(R.id.switch_tank_alarm);
-        switchTankAlarm.setChecked(pref.getBoolean("NOTIF_TANK_ALARM", false));
-        switchTankAlarm.setOnCheckedChangeListener((btn, checked) -> {
-            pref.saveBoolean("NOTIF_TANK_ALARM", checked);
-            Toast.makeText(this, getString(R.string.alert_tank_alarm_title) + ": " + (checked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-        });
-
-        // Bottom Navigation — tab switch (crossfade)
         setupBottomNav();
+    }
+
+    private void setupSwitch(MaterialSwitch mSwitch, String key, boolean defaultValue, String title) {
+        // Restore state
+        mSwitch.setChecked(pref.getBoolean(key, defaultValue));
+        
+        // Listener with feedback
+        mSwitch.setOnCheckedChangeListener((btn, checked) -> {
+            pref.saveBoolean(key, checked);
+            String message = String.format(getString(checked ? R.string.notif_enabled : R.string.notif_disabled), title);
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void applyStatusBarInsets() {

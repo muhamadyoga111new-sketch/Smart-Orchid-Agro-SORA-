@@ -71,158 +71,176 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Toggle -->
+                    <!-- Toggle Section -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/auto_watering"
+                                android:textColor="@color/text_main"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switch_auto_watering"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                app:thumbTint="@color/white"
+                                app:trackTint="@color/switch_track_custom" />
+                        </LinearLayout>
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/auto_watering"
-                            android:textColor="@color/text_main"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/switch_auto_watering"
+                            android:id="@+id/tv_switch_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
-                            app:thumbTint="@color/white"
-                            app:trackTint="@color/switch_on" />
+                            android:text="@string/auto_watering_on"
+                            android:textColor="@color/text_sub"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="16dp"
-                        android:background="@color/divider" />
-
-                    <!-- Time -->
+                    <!-- Content Container (Target for state change) -->
                     <LinearLayout
-                        android:id="@+id/layout_time"
+                        android:id="@+id/layoutContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:minHeight="48dp"
-                        android:foreground="?android:attr/selectableItemBackground">
+                        android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_history"
-                            app:tint="@color/nav_active"
-                            android:contentDescription="@string/default_time" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="16dp"
+                            android:background="@color/divider" />
 
-                        <TextView
-                            android:id="@+id/tv_time"
-                            android:layout_width="wrap_content"
+                        <!-- Time Selection -->
+                        <LinearLayout
+                            android:id="@+id/layout_time"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/default_time"
-                            android:textColor="@color/text_main"
-                            android:textSize="32sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                            android:gravity="center_vertical"
+                            android:minHeight="48dp"
+                            android:foreground="?android:attr/selectableItemBackground">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="16dp"
-                        android:background="@color/divider" />
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@drawable/ic_history"
+                                app:tint="@color/nav_active"
+                                android:contentDescription="@string/default_time" />
 
-                    <!-- Day Selector (FIXED: Sized to fit all days) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingVertical="4dp"
-                        android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/tv_time"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:text="@string/default_time"
+                                android:textColor="@color/text_main"
+                                android:textSize="32sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
-                        <TextView android:id="@+id/day_sen" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sen" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_sel" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sel" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_rab" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_rab" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_kam" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_kam" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_jum" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_jum" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_sab" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sab" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
-                        <TextView android:id="@+id/day_min" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_min" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="16dp"
+                            android:background="@color/divider" />
 
-            <!-- Durasi Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/card_stroke"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Day Selection -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/durasi"
-                            android:textColor="@color/text_main"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:gravity="center"
+                            android:paddingVertical="4dp"
+                            android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/tv_durasi_value"
-                            android:layout_width="wrap_content"
+                            <TextView android:id="@+id/day_sen" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sen" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_sel" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sel" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_rab" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_rab" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_kam" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_kam" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_jum" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_jum" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_sab" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_sab" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" android:layout_marginEnd="6dp" />
+                            <TextView android:id="@+id/day_min" android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:text="@string/day_min" android:textSize="11sp" android:textStyle="bold" android:background="@drawable/bg_day_selected" android:textColor="@color/white" />
+                        </LinearLayout>
+
+                        <!-- Duration Section (Moved inside content container) -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="16dp"
+                            android:background="@color/divider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="@string/durasi_value"
-                            android:textColor="@color/nav_active"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                            android:orientation="vertical">
 
-                    <SeekBar
-                        android:id="@+id/seekbar_durasi"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:max="25"
-                        android:progress="5"
-                        android:progressTint="@color/nav_active"
-                        android:thumbTint="@color/nav_active" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center_vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/durasi"
+                                    android:textColor="@color/text_main"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/min_5"
-                            android:textColor="@color/text_caption"
-                            android:textSize="12sp" />
+                                <TextView
+                                    android:id="@+id/tv_durasi_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:text="@string/durasi_value"
+                                    android:textColor="@color/nav_active"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/max_30"
-                            android:textColor="@color/text_caption"
-                            android:textSize="12sp" />
+                            <SeekBar
+                                android:id="@+id/seekbar_durasi"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:max="25"
+                                android:progress="5"
+                                android:progressTint="@color/nav_active"
+                                android:thumbTint="@color/nav_active" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/min_5"
+                                    android:textColor="@color/text_caption"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/max_30"
+                                    android:textColor="@color/text_caption"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
