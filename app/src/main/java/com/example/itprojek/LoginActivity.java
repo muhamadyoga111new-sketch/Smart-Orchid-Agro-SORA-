@@ -70,8 +70,8 @@ public class LoginActivity extends AppCompatActivity {
         // Mulai animasi denyut pada teks petunjuk
         startPulseAnimation(tvTapHint);
 
-        // Klik logo → tampilkan form
-        heroSection.setOnClickListener(v -> showLoginForm());
+        // Klik logo → tampilkan / sembunyikan form (toggle)
+        heroSection.setOnClickListener(v -> toggleLoginForm());
 
         // Toggle show/hide password
         ivTogglePassword.setOnClickListener(v -> togglePassword());
@@ -81,34 +81,64 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // ─────────────────────────────────────────────
-    //  Tampilkan form (animasi logo naik + card naik)
+    //  Toggle form: tampilkan atau sembunyikan
     // ─────────────────────────────────────────────
-    private void showLoginForm() {
-        if (formVisible) return;
-        formVisible = true;
+    private void toggleLoginForm() {
+        if (!formVisible) {
+            // ── TAMPILKAN FORM ──
+            formVisible = true;
 
-        // Sembunyikan teks petunjuk dengan fade-out
-        tvTapHint.animate()
-                .alpha(0f)
-                .setDuration(200)
-                .withEndAction(() -> tvTapHint.setVisibility(View.GONE))
-                .start();
+            // Sembunyikan teks petunjuk
+            tvTapHint.animate()
+                    .alpha(0f)
+                    .setDuration(200)
+                    .withEndAction(() -> tvTapHint.setVisibility(View.GONE))
+                    .start();
 
-        // Geser hero section ke atas
-        float moveUpPx = getResources().getDisplayMetrics().density * 155f;
-        heroSection.animate()
-                .translationY(-moveUpPx)
-                .setDuration(450)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
+            // Geser hero section ke atas
+            float moveUpPx = getResources().getDisplayMetrics().density * 155f;
+            heroSection.animate()
+                    .translationY(-moveUpPx)
+                    .setDuration(450)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .start();
 
-        // Tampilkan card dan slide ke atas dari bawah layar
-        cardLogin.setVisibility(View.VISIBLE);
-        cardLogin.animate()
-                .translationY(0f)
-                .setDuration(480)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
+            // Slide card naik dari bawah
+            cardLogin.setVisibility(View.VISIBLE);
+            cardLogin.animate()
+                    .translationY(0f)
+                    .setDuration(480)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .start();
+
+        } else {
+            // ── SEMBUNYIKAN FORM ──
+            formVisible = false;
+
+            // Slide card turun ke bawah layar
+            float cardOffScreenY = cardLogin.getHeight() + 400f;
+            cardLogin.animate()
+                    .translationY(cardOffScreenY)
+                    .setDuration(400)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .withEndAction(() -> cardLogin.setVisibility(View.INVISIBLE))
+                    .start();
+
+            // Kembalikan hero ke posisi tengah
+            heroSection.animate()
+                    .translationY(0f)
+                    .setDuration(420)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .start();
+
+            // Tampilkan kembali teks petunjuk
+            tvTapHint.setVisibility(View.VISIBLE);
+            tvTapHint.animate()
+                    .alpha(0.80f)
+                    .setDuration(300)
+                    .withEndAction(() -> startPulseAnimation(tvTapHint))
+                    .start();
+        }
     }
 
     // ─────────────────────────────────────────────
