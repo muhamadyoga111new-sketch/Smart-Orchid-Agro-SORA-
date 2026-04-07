@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDataManager dataManager;
     private MaterialSwitch      switchPump;
     private TextView            tvPumpStatus;
+    private MaterialSwitch      switchEmergency;
+    private boolean             isEmergencyUpdating = false;
+    private boolean             isPumpUpdating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Align all three items (menu, notification, and title) down by status bar height
-            // so they are perfectly centered in the visible part of the header
             View btnMenuRef = findViewById(R.id.btn_menu);
             if (btnMenuRef != null) {
                 ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
@@ -143,16 +146,34 @@ public class MainActivity extends AppCompatActivity {
         switchPump   = findViewById(R.id.switch_pump);
         tvPumpStatus = findViewById(R.id.tv_pump_status);
 
-        // Nilai awal dari SharedPreferences (sementara sebelum Firebase terbaca)
+        // Nilai awal dari SharedPreferences
         boolean pumpSaved = pref.getBoolean("STATUS_POMPA", false);
         switchPump.setChecked(pumpSaved);
         updatePumpStatusUI(tvPumpStatus, pumpSaved);
 
         switchPump.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            pref.saveBoolean("STATUS_POMPA", isChecked);
-            updatePumpStatusUI(tvPumpStatus, isChecked);
-            // Tulis perubahan pompa ke Firebase (dibaca IoT device)
-            dataManager.setPumpStatus(isChecked);
+            if (isPumpUpdating) return;
+
+            String message = isChecked ? "Yakin ingin menyalakan pompa?" : "Yakin ingin mematikan pompa?";
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Konfirmasi Pompa")
+                    .setMessage(message)
+                    .setPositiveButton("Ya", (dialog, which) -> {
+                        pref.saveBoolean("STATUS_POMPA", isChecked);
+                        updatePumpStatusUI(tvPumpStatus, isChecked);
+                        // Tulis perubahan pompa ke Firebase
+                        dataManager.setPumpStatus(isChecked);
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton("Batal", (dialog, which) -> {
+                        isPumpUpdating = true;
+                        switchPump.setChecked(!isChecked);
+                        isPumpUpdating = false;
+                        dialog.dismiss();
+                    })
+                    .setCancelable(false)
+                    .show();
         });
 
         // === Sensor data real-time dari Firebase ===
@@ -173,7 +194,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // Sync status pompa dari Firebase ke UI
                 if (switchPump.isChecked() != pumpStatus) {
+                    isPumpUpdating = true;
                     switchPump.setChecked(pumpStatus);
+                    isPumpUpdating = false;
                     pref.saveBoolean("STATUS_POMPA", pumpStatus);
                     updatePumpStatusUI(tvPumpStatus, pumpStatus);
                 }
@@ -181,25 +204,40 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(String errorMessage) {
-                // Tampilkan error ringan tanpa crash
                 android.util.Log.w("SORA-DB", "Realtime DB error: " + errorMessage);
             }
         });
 
-        // Emergency Stop panel
-        LinearLayout emergencyPanel = findViewById(R.id.emergency_panel);
-        applyScaleAnimation(emergencyPanel);
-        emergencyPanel.setOnClickListener(v -> {
+        // === Emergency Stop Section ===
+        switchEmergency = findViewById(R.id.switch_emergency);
+        switchEmergency.setTrackTintList(ContextCompat.getColorStateList(this, R.color.switch_track_emergency));
+        
+        switchEmergency.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isEmergencyUpdating) return;
+
+            String message = isChecked ? "Apakah Anda yakin ingin mengaktifkan Emergency Stop?" : "Apakah Anda yakin ingin menonaktifkan Emergency Stop?";
+
             new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.confirm_emergency_title))
-                    .setMessage(getString(R.string.confirm_emergency_msg))
-                    .setPositiveButton(getString(R.string.btn_yes), (dialog, which) -> {
-                        switchPump.setChecked(false);
-                        dataManager.setPumpStatus(false);
+                    .setTitle("Konfirmasi")
+                    .setMessage(message)
+                    .setPositiveButton("YA", (dialog, which) -> {
+                        // Jalankan logic emergency
+                        if (isChecked) {
+                            isPumpUpdating = true;
+                            switchPump.setChecked(false);
+                            isPumpUpdating = false;
+                            dataManager.setPumpStatus(false);
+                        }
                         dialog.dismiss();
                     })
-                    .setNegativeButton(getString(R.string.btn_cancel), (d, w) -> d.dismiss())
-                    .setCancelable(true)
+                    .setNegativeButton("BATAL", (dialog, which) -> {
+                        // Kembalikan ke state sebelumnya tanpa memicu listener lagi
+                        isEmergencyUpdating = true;
+                        switchEmergency.setChecked(!isChecked);
+                        isEmergencyUpdating = false;
+                        dialog.dismiss();
+                    })
+                    .setCancelable(false)
                     .show();
         });
 
@@ -229,13 +267,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Hentikan listener Realtime Database agar tidak memory leak
         if (dataManager != null) dataManager.stopListening();
     }
 
-    // ─────────────────────────────────────────────
-    //  Shows the "Tentang Aplikasi" dialog
-    // ─────────────────────────────────────────────
     private void showAboutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Tentang Aplikasi")
@@ -249,9 +283,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ─────────────────────────────────────────────
-    //  Logout via Firebase Auth
-    // ─────────────────────────────────────────────
     private void logout() {
         new AlertDialog.Builder(this)
                 .setTitle("Keluar")
@@ -266,9 +297,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ─────────────────────────────────────────────
-    //  Navigasi ke LoginActivity, bersihkan back stack
-    // ─────────────────────────────────────────────
     private void goToLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
