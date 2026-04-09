@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="90dp"
+    android:height="100dp"
+    android:viewportWidth="90"
+    android:viewportHeight="100">
+
+    <!-- Dark blue water body base -->
+    <path
+        android:fillColor="#1A56A0"
+        android:pathData="M0,0 L90,0 L90,100 L0,100 Z" />
+
+    <!-- Lighter blue wave crest at top -->
+    <path
+        android:fillColor="#2979D0"
+        android:pathData="M0,22 Q11,4 22,22 Q34,40 45,22 Q56,4 67,22 Q79,40 90,22 L90,0 L0,0 Z" />
+
+    <!-- Subtle highlight sheen -->
+    <path
+        android:fillColor="#4EA8E8"
+        android:alpha="0.35"
+        android:pathData="M0,12 Q11,2 22,12 Q34,22 45,12 Q56,2 67,12 Q79,22 90,12 L90,0 L0,0 Z" />
+
+    <!-- Small bubble -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:alpha="0.25"
+        android:pathData="M16,62 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+
+</vector>
