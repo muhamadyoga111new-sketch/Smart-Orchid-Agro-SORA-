@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,22 +13,22 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:background="@color/green_header"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/btn_back"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
-        android:contentDescription="@string/app_name"
         android:padding="8dp"
         android:src="@drawable/ic_back"
+        android:contentDescription="@string/app_name"
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@id/header_bg"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/header_bg" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,19 +37,20 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/header_bg"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/header_bg" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Content -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/header_bg"
         app:layout_constraintBottom_toTopOf="@id/btn_save"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_bg">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,7 +58,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Description (Miller's Law: clear explanation) -->
+            <!-- Description -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,15 +68,15 @@
                 android:lineSpacingExtra="4dp"
                 android:layout_marginBottom="20dp" />
 
-            <!-- Kering Slider Card (Law of Common Region: each slider in its own card) -->
+            <!-- Kering -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="@color/card_stroke"
-                android:layout_marginBottom="12dp">
+                app:strokeColor="@color/card_stroke">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -86,7 +89,6 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical">
 
-                        <!-- Color indicator (Law of Similarity: red = kering) -->
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
@@ -122,7 +124,6 @@
                         android:progressTint="@color/gauge_red"
                         android:thumbTint="@color/gauge_red" />
 
-                    <!-- Postel's Law: clear min/max range -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -143,18 +144,19 @@
                             android:textColor="@color/text_caption"
                             android:textSize="11sp" />
                     </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Normal Slider Card -->
+            <!-- Normal -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="@color/card_stroke"
-                android:layout_marginBottom="12dp">
+                app:strokeColor="@color/card_stroke">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -167,7 +169,6 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical">
 
-                        <!-- Color indicator: green = normal -->
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
@@ -223,10 +224,11 @@
                             android:textColor="@color/text_caption"
                             android:textSize="11sp" />
                     </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Lembap Slider Card -->
+            <!-- Lembap -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -246,7 +248,6 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical">
 
-                        <!-- Color indicator: blue = lembap -->
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
@@ -281,13 +282,14 @@
                         android:progress="50"
                         android:progressTint="@color/water_blue"
                         android:thumbTint="@color/water_blue" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Save Button (Fitts's Law: large, prominent) -->
+    <!-- Save Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_save"
         android:layout_width="0dp"
@@ -303,37 +305,109 @@
         app:backgroundTint="@color/nav_active"
         app:cornerRadius="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
         android:layout_height="72dp"
+        android:orientation="horizontal"
         android:background="@color/white"
         android:elevation="12dp"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_active" android:contentDescription="@string/beranda" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_active" android:textSize="11sp" />
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_home"
+                app:tint="@color/nav_active" />
+
+            <TextView
+                android:layout_marginTop="2dp"
+                android:text="@string/beranda"
+                android:textColor="@color/nav_active"
+                android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+
+        <!-- History -->
+        <LinearLayout
+            android:id="@+id/nav_history"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/nav_inactive" />
+
+            <TextView
+                android:layout_marginTop="2dp"
+                android:text="@string/riwayat"
+                android:textColor="@color/nav_inactive"
+                android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_notification" app:tint="@color/nav_inactive" android:contentDescription="@string/notifikasi" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+
+        <!-- Notifications -->
+        <LinearLayout
+            android:id="@+id/nav_notifications"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_notification"
+                app:tint="@color/nav_inactive" />
+
+            <TextView
+                android:layout_marginTop="2dp"
+                android:text="@string/notifikasi"
+                android:textColor="@color/nav_inactive"
+                android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" app:tint="@color/nav_inactive" android:contentDescription="@string/pengaturan" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+
+        <!-- Settings -->
+        <LinearLayout
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/nav_inactive" />
+
+            <TextView
+                android:layout_marginTop="2dp"
+                android:text="@string/pengaturan"
+                android:textColor="@color/nav_inactive"
+                android:textSize="11sp" />
         </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
