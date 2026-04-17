@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.activity.OnBackPressedCallback;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,15 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         hideSystemNavBar();
+
+        // Handle Back Press with OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finish();
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            }
+        });
 
         // Handle StatusBar insets for the header
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header_bg), (v, insets) -> {
@@ -99,9 +109,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void logout() {
         new AlertDialog.Builder(this)
-                .setTitle("Keluar")
-                .setMessage("Apakah Anda yakin ingin keluar dari akun?")
-                .setPositiveButton("Keluar", (dialog, which) -> {
+                .setTitle("Konfirmasi")
+                .setMessage("Yakin ingin keluar dari akun?")
+                .setPositiveButton("LANJUTKAN", (dialog, which) -> {
                     FirebaseAuth.getInstance().signOut();
                     Intent intent = new Intent(this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -109,16 +119,12 @@ public class ProfileActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
                 })
-                .setNegativeButton("Batal", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("BATAL", (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {

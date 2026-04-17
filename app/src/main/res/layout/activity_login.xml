@@ -39,7 +39,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.15"
             android:text="SORA"
             android:textColor="#FFFFFF"
@@ -97,7 +96,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
                 android:text="Masuk ke Akun"
                 android:textColor="@color/text_main"
                 android:textSize="20sp"
@@ -116,7 +114,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:fontFamily="sans-serif-medium"
                 android:text="Email"
                 android:textColor="@color/text_main"
                 android:textSize="13sp" />
@@ -154,7 +151,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:fontFamily="sans-serif-medium"
                 android:text="Password"
                 android:textColor="@color/text_main"
                 android:textSize="13sp" />
@@ -194,7 +190,7 @@
                     android:layout_marginEnd="12dp"
                     android:contentDescription="Toggle password visibility"
                     android:src="@android:drawable/ic_menu_view"
-                    android:tint="@color/text_sub" />
+                    app:tint="@color/text_sub" />
             </FrameLayout>
 
             <!-- ===== TOMBOL LOGIN ===== -->
@@ -220,7 +216,6 @@
                         android:id="@+id/tv_login_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
                         android:text="Masuk"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"

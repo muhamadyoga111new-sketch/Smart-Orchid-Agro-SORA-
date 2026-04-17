@@ -22,6 +22,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.activity.OnBackPressedCallback;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.navigation.NavigationView;
@@ -64,6 +65,19 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.drawer_home);
+
+        // Handle Back Press with OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
 
         // Hamburger menu button opens drawer
         ImageView btnMenu = findViewById(R.id.btn_menu);
@@ -157,16 +171,16 @@ public class MainActivity extends AppCompatActivity {
             String message = isChecked ? "Yakin ingin menyalakan pompa?" : "Yakin ingin mematikan pompa?";
 
             new AlertDialog.Builder(this)
-                    .setTitle("Konfirmasi Pompa")
+                    .setTitle("Konfirmasi")
                     .setMessage(message)
-                    .setPositiveButton("Ya", (dialog, which) -> {
+                    .setPositiveButton("LANJUTKAN", (dialog, which) -> {
                         pref.saveBoolean("STATUS_POMPA", isChecked);
                         updatePumpStatusUI(tvPumpStatus, isChecked);
                         // Tulis perubahan pompa ke Firebase
                         dataManager.setPumpStatus(isChecked);
                         dialog.dismiss();
                     })
-                    .setNegativeButton("Batal", (dialog, which) -> {
+                    .setNegativeButton("BATAL", (dialog, which) -> {
                         isPumpUpdating = true;
                         switchPump.setChecked(!isChecked);
                         isPumpUpdating = false;
@@ -215,12 +229,12 @@ public class MainActivity extends AppCompatActivity {
         switchEmergency.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isEmergencyUpdating) return;
 
-            String message = isChecked ? "Apakah Anda yakin ingin mengaktifkan Emergency Stop?" : "Apakah Anda yakin ingin menonaktifkan Emergency Stop?";
+            String message = isChecked ? "Yakin ingin mengaktifkan Emergency Stop?" : "Yakin ingin mematikan Emergency Stop?";
 
             new AlertDialog.Builder(this)
                     .setTitle("Konfirmasi")
                     .setMessage(message)
-                    .setPositiveButton("YA", (dialog, which) -> {
+                    .setPositiveButton("LANJUTKAN", (dialog, which) -> {
                         // Jalankan logic emergency
                         if (isChecked) {
                             isPumpUpdating = true;
@@ -285,14 +299,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void logout() {
         new AlertDialog.Builder(this)
-                .setTitle("Keluar")
-                .setMessage("Apakah Anda yakin ingin keluar dari akun?")
-                .setPositiveButton("Keluar", (dialog, which) -> {
+                .setTitle("Konfirmasi")
+                .setMessage("Yakin ingin keluar dari akun?")
+                .setPositiveButton("LANJUTKAN", (dialog, which) -> {
                     if (dataManager != null) dataManager.stopListening();
                     FirebaseAuth.getInstance().signOut();
                     goToLogin();
                 })
-                .setNegativeButton("Batal", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("BATAL", (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }
@@ -329,14 +343,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
