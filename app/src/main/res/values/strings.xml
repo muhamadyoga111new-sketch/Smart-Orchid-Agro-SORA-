@@ -6,7 +6,7 @@
     <string name="moisture_value">32%</string>
     <string name="kering">Kering</string>
     <string name="normal">Normal</string>
-    <string name="lembap">Lembap</string>
+    <string name="lembap">Lembab</string>
     <string name="water_level">Level Air Tangki</string>
     <string name="water_value">45%</string>
     <string name="pump_control">Kontrol Pompa</string>
@@ -38,7 +38,7 @@
     <string name="notif_dry_desc">Kelembapan sangat rendah!\nSegera lakukan penyiraman!</string>
     <string name="notif_tank_title">Air Tangki Habis</string>
     <string name="notif_tank_desc">Level air tangki kosong!\nSegera isi ulang tangki!</string>
-    <string name="notif_moist_title">Tanah Lembap</string>
+    <string name="notif_moist_title">Tanah Lembab</string>
     <string name="notif_moist_desc">Kelembapan tanah normal</string>
     <string name="notif_pump_title">Pompa Menyala</string>
     <string name="notif_pump_desc">Pompa air sedang menyiram.</string>
@@ -108,8 +108,8 @@
     <string name="alert_tank_desc">Dapatkan peringatan saat air tangki habis untuk segera diisi ulang.</string>
 
     <string name="category_info">Informasi Sistem</string>
-    <string name="alert_moist_title">Tanah Lembap</string>
-    <string name="alert_moist_desc">Notifikasi saat kondisi tanah sudah kembali normal atau lembap.</string>
+    <string name="alert_moist_title">Tanah Lembab</string>
+    <string name="alert_moist_desc">Notifikasi saat kondisi tanah sudah kembali normal atau lembab.</string>
 
     <string name="category_alarm">Keamanan Pompa</string>
     <string name="alert_tank_alarm_title">Proteksi Pompa Air</string>

@@ -189,7 +189,8 @@
                             android:layout_height="wrap_content"
                             android:text="@string/kering"
                             android:textColor="@color/gauge_red"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:alpha="0.5" />
 
                         <View
                             android:layout_width="20dp"
@@ -216,7 +217,8 @@
                             android:layout_height="wrap_content"
                             android:text="@string/lembap"
                             android:textColor="@color/water_blue"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:alpha="0.5" />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
