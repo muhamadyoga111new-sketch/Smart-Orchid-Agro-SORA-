@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Align all three items (menu, notification, and title) down by status bar height
+            // They are constrained to TOP and BOTTOM of header_bg, so this centers them in the 60dp area
             View btnMenuRef = findViewById(R.id.btn_menu);
             if (btnMenuRef != null) {
                 ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                         tvTitle.getLayoutParams()).topMargin = systemBars.top;
                 tvTitle.requestLayout();
             }
+
 
             return insets;
         });

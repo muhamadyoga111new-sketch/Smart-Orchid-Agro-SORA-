@@ -71,12 +71,14 @@ public class NotificationsActivity extends AppCompatActivity {
                 headerBg.getLayoutParams().height = base60px + statusH;
                 headerBg.requestLayout();
             }
+
             View btnBack = findViewById(R.id.btn_back);
             if (btnBack != null && btnBack.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
                 ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
                 p.topMargin = statusH;
                 btnBack.setLayoutParams(p);
             }
+
             View tvTitle = findViewById(R.id.tv_header_title);
             if (tvTitle != null && tvTitle.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
                 ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();

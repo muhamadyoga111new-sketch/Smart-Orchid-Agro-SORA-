@@ -19,7 +19,7 @@
             android:id="@+id/header_bg"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:background="@drawable/bg_header"
+            android:background="#4CAF50"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -38,15 +38,17 @@
 
         <TextView
             android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:gravity="center"
             android:text="@string/title_dashboard"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/header_bg"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_notification_top"
+            app:layout_constraintStart_toEndOf="@id/btn_menu"
             app:layout_constraintTop_toTopOf="@id/header_bg" />
 
         <ImageView

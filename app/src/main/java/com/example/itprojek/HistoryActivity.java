@@ -230,6 +230,12 @@ public class HistoryActivity extends AppCompatActivity {
                 p.topMargin = statusH;
                 btnBack.setLayoutParams(p);
             }
+            View btnSync = findViewById(R.id.btn_sync);
+            if (btnSync != null && btnSync.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnSync.getLayoutParams();
+                p.topMargin = statusH;
+                btnSync.setLayoutParams(p);
+            }
             View tvTitle = findViewById(R.id.tv_header_title);
             if (tvTitle != null && tvTitle.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
                 ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();

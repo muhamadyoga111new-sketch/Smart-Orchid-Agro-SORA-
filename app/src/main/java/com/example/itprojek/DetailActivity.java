@@ -17,7 +17,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,9 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView    tvConnectionStatus, tvLastUpdated;
     private TextView    tvMoistureDetail, tvSoilStatus;
     private TextView    tvWaterDetail, tvWaterStatus;
-    private TextView    tvPumpDetail;
     private ProgressBar pbMoisture, pbWater;
-    private View        viewPumpLed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +63,8 @@ public class DetailActivity extends AppCompatActivity {
         tvSoilStatus       = findViewById(R.id.tv_soil_status);
         tvWaterDetail      = findViewById(R.id.tv_water_detail);
         tvWaterStatus      = findViewById(R.id.tv_water_status);
-        tvPumpDetail       = findViewById(R.id.tv_pump_detail);
         pbMoisture         = findViewById(R.id.pb_moisture);
         pbWater            = findViewById(R.id.pb_water);
-        viewPumpLed        = findViewById(R.id.view_pump_led);
 
         // ── Tombol back ──
         ImageView btnBack = findViewById(R.id.btn_back);
@@ -86,7 +81,6 @@ public class DetailActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     updateSoilMoisture(soilMoisture);
                     updateWaterLevel(waterLevel);
-                    updatePumpStatus(pumpStatus);
                     updateTimestamp();
                     setConnectionOnline();
                 });
@@ -169,18 +163,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     // ─────────────────────────────────────────────
-    //  Update UI: Status Pompa
-    // ─────────────────────────────────────────────
-    private void updatePumpStatus(boolean isOn) {
-        tvPumpDetail.setText(isOn ? getString(R.string.on) : getString(R.string.off));
-        tvPumpDetail.setTextColor(Color.parseColor(isOn ? "#43A047" : "#EF5350"));
-
-        // LED indikator: hijau = ON, abu = OFF
-        viewPumpLed.setBackgroundColor(
-                Color.parseColor(isOn ? "#43A047" : "#BDBDBD"));
-    }
-
-    // ─────────────────────────────────────────────
     //  Timestamp update terakhir
     // ─────────────────────────────────────────────
     private void updateTimestamp() {
@@ -221,10 +203,10 @@ public class DetailActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             int statusH  = systemBars.top;
-            int base60px = (int) (60 * getResources().getDisplayMetrics().density);
-
+            
             View headerBg = findViewById(R.id.header_bg);
             if (headerBg != null) {
+                int base60px = (int) (60 * getResources().getDisplayMetrics().density);
                 headerBg.getLayoutParams().height = base60px + statusH;
                 headerBg.requestLayout();
             }
@@ -242,6 +224,7 @@ public class DetailActivity extends AppCompatActivity {
                 p.topMargin = statusH;
                 tvTitle.setLayoutParams(p);
             }
+
             return insets;
         });
     }

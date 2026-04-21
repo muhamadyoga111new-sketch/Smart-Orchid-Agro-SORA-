@@ -1,11 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ITPROJEK" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Force Light Mode — app always uses original colors even in device dark mode -->
+    <style name="Base.Theme.ITPROJEK" parent="Theme.Material3.Light.NoActionBar">
 
         <!-- TAMBAHAN FONT -->
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="fontFamily">@font/poppins_regular</item>
 
-        <!-- (biarkan yang lain kosong / default) -->
+        <!-- Anti-ghosting -->
+        <item name="android:windowBackground">@color/bg_app</item>
+        <item name="android:windowIsTranslucent">false</item>
+
+        <!-- Transparent status/nav bar -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="Theme.ITPROJEK" parent="Base.Theme.ITPROJEK" />
 </resources>
