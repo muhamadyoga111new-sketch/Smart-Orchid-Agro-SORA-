@@ -136,10 +136,12 @@
 
             <!-- Card 1: Soil Moisture -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_moisture"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="8dp"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
                 app:strokeColor="@color/card_stroke"
@@ -174,7 +176,7 @@
                         app:layout_constraintBottom_toTopOf="@id/layout_moisture_labels"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toBottomOf="@id/tv_moisture_title" />
 
                     <LinearLayout
                         android:id="@+id/layout_moisture_labels"
@@ -225,10 +227,12 @@
 
             <!-- Card 2: Water Level -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_water"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="8dp"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
                 app:strokeColor="@color/card_stroke"
@@ -255,9 +259,10 @@
                     <RelativeLayout
                         android:id="@+id/layout_tank"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/tv_water_title">
 
                         <View
                             android:id="@+id/tank_outline"
@@ -267,6 +272,7 @@
                             android:background="@color/water_tank_bg" />
 
                         <View
+                            android:id="@+id/water_fill"
                             android:layout_width="80dp"
                             android:layout_height="40dp"
                             android:layout_alignBottom="@id/tank_outline"

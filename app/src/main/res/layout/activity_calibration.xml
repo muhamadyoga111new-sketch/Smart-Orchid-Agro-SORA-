@@ -31,6 +31,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
+        android:id="@+id/tv_header_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sensor_calibration"
@@ -332,10 +333,13 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:contentDescription="@string/beranda"
                 android:src="@drawable/ic_home"
                 app:tint="@color/nav_active" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="@string/beranda"
                 android:textColor="@color/nav_active"
@@ -354,10 +358,13 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:contentDescription="@string/riwayat"
                 android:src="@drawable/ic_history"
                 app:tint="@color/nav_inactive" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="@string/riwayat"
                 android:textColor="@color/nav_inactive"
@@ -376,10 +383,13 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:contentDescription="@string/notifikasi"
                 android:src="@drawable/ic_notification"
                 app:tint="@color/nav_inactive" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="@string/notifikasi"
                 android:textColor="@color/nav_inactive"
@@ -398,10 +408,13 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:contentDescription="@string/pengaturan"
                 android:src="@drawable/ic_settings"
                 app:tint="@color/nav_inactive" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="@string/pengaturan"
                 android:textColor="@color/nav_inactive"

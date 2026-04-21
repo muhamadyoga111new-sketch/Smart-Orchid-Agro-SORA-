@@ -28,6 +28,11 @@
             android:icon="@drawable/ic_profile"
             android:title="@string/profil_pengguna" />
 
+        <item
+            android:id="@+id/drawer_detail"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/detail_sensor" />
+
     </group>
 
     <!-- Divider line automatically appears between groups -->

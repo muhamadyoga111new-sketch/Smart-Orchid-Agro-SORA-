@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -39,11 +41,30 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Handle StatusBar insets for the header
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header_bg), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-            int basePx = (int) (60 * getResources().getDisplayMetrics().density);
-            v.getLayoutParams().height = basePx + systemBars.top;
-            v.requestLayout();
+            int statusH  = systemBars.top;
+            int base60px = (int) (60 * getResources().getDisplayMetrics().density);
+
+            View headerBg = findViewById(R.id.header_bg);
+            if (headerBg != null) {
+                headerBg.getLayoutParams().height = base60px + statusH;
+                headerBg.requestLayout();
+            }
+
+            View btnBack = findViewById(R.id.btn_back);
+            if (btnBack != null && btnBack.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
+                p.topMargin = statusH;
+                btnBack.setLayoutParams(p);
+            }
+
+            View tvTitle = findViewById(R.id.tv_header_title);
+            if (tvTitle != null && tvTitle.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();
+                p.topMargin = statusH;
+                tvTitle.setLayoutParams(p);
+            }
             return insets;
         });
 

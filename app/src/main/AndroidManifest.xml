@@ -40,6 +40,7 @@
         <activity android:name=".ScheduleActivity" />
         <activity android:name=".CalibrationActivity" />
         <activity android:name=".NotifAlertActivity" />
+        <activity android:name=".DetailActivity" />
 
         <!-- Firebase Cloud Messaging Service -->
         <service

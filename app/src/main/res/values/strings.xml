@@ -130,4 +130,14 @@
     <string name="btn_yes">Ya, Hentikan</string>
     <string name="btn_cancel">Batal</string>
     <string name="simpan_pengaturan">Simpan Pengaturan</string>
+
+    <!-- Detail Sensor -->
+    <string name="detail_sensor">Detail Sensor</string>
+    <string name="status_perangkat">STATUS PERANGKAT</string>
+    <string name="section_data_sensor">DATA SENSOR</string>
+    <string name="section_status_pompa">KONTROL POMPA</string>
+    <string name="section_info_perangkat">INFORMASI PERANGKAT IoT</string>
+    <string name="cloud_connection">Koneksi Cloud</string>
+    <string name="versi_firmware">Versi Firmware</string>
+
 </resources>

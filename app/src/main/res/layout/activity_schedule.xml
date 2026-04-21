@@ -29,6 +29,7 @@
         app:layout_constraintTop_toTopOf="@id/header_bg" />
 
     <TextView
+        android:id="@+id/tv_header_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/schedule_settings"
@@ -136,18 +137,43 @@
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_history"
-                                app:tint="@color/nav_active"
+                                app:tint="@color/gauge_green"
                                 android:contentDescription="@string/default_time" />
 
                             <TextView
                                 android:id="@+id/tv_time"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:layout_marginStart="16dp"
                                 android:text="@string/default_time"
                                 android:textColor="@color/text_main"
                                 android:textSize="32sp"
                                 android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="8dp"
+                                android:paddingStart="12dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_edit"
+                                    app:tint="@color/nav_active"
+                                    android:contentDescription="Ubah waktu" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:text="Ubah waktu"
+                                    android:textColor="@color/nav_active"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
                         </LinearLayout>
 
                         <View

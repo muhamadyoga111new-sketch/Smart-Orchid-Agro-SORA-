@@ -102,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.drawer_profile) {
                     startActivity(new Intent(this, ProfileActivity.class));
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else if (id == R.id.drawer_detail) {
+                    startActivity(new Intent(this, DetailActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else if (id == R.id.drawer_about) {
                     showAboutDialog();
                 } else if (id == R.id.drawer_logout) {
@@ -156,6 +159,16 @@ public class MainActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
+        // === Sensor cards → DetailActivity ===
+        com.google.android.material.card.MaterialCardView cardMoisture = findViewById(R.id.card_moisture);
+        com.google.android.material.card.MaterialCardView cardWater    = findViewById(R.id.card_water);
+        android.view.View.OnClickListener goToDetail = v -> {
+            startActivity(new Intent(this, DetailActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        };
+        if (cardMoisture != null) cardMoisture.setOnClickListener(goToDetail);
+        if (cardWater    != null) cardWater.setOnClickListener(goToDetail);
+
         // === Pump toggle — terhubung ke Firebase Realtime Database ===
         switchPump   = findViewById(R.id.switch_pump);
         tvPumpStatus = findViewById(R.id.tv_pump_status);
@@ -204,6 +217,20 @@ public class MainActivity extends AppCompatActivity {
                 TextView tvWaterValue = findViewById(R.id.tv_water_value);
                 if (tvWaterValue != null) {
                     tvWaterValue.setText(waterLevel + "%");
+                }
+
+                View waterFill = findViewById(R.id.water_fill);
+                View tankOutline = findViewById(R.id.tank_outline);
+                if (waterFill != null && tankOutline != null) {
+                    Runnable updateHeight = () -> {
+                        waterFill.getLayoutParams().height = (int) (tankOutline.getHeight() * (waterLevel / 100f));
+                        waterFill.requestLayout();
+                    };
+                    if (tankOutline.getHeight() > 0) {
+                        updateHeight.run();
+                    } else {
+                        tankOutline.post(updateHeight);
+                    }
                 }
 
                 // Sync status pompa dari Firebase ke UI

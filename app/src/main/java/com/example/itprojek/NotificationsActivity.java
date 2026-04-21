@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -60,12 +62,27 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void applyStatusBarInsets() {
-        View headerBg = findViewById(R.id.header_bg);
-        ViewCompat.setOnApplyWindowInsetsListener(headerBg, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-            v.getLayoutParams().height = (int) (60 * getResources().getDisplayMetrics().density) + systemBars.top;
-            v.setPadding(0, systemBars.top, 0, 0);
-            v.requestLayout();
+            int statusH  = systemBars.top;
+            int base60px = (int) (60 * getResources().getDisplayMetrics().density);
+            View headerBg = findViewById(R.id.header_bg);
+            if (headerBg != null) {
+                headerBg.getLayoutParams().height = base60px + statusH;
+                headerBg.requestLayout();
+            }
+            View btnBack = findViewById(R.id.btn_back);
+            if (btnBack != null && btnBack.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
+                p.topMargin = statusH;
+                btnBack.setLayoutParams(p);
+            }
+            View tvTitle = findViewById(R.id.tv_header_title);
+            if (tvTitle != null && tvTitle.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();
+                p.topMargin = statusH;
+                tvTitle.setLayoutParams(p);
+            }
             return insets;
         });
     }

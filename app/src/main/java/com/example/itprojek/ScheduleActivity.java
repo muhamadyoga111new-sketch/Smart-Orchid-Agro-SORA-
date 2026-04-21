@@ -160,12 +160,30 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     private void applyStatusBarInsets() {
-        final View headerBg = findViewById(R.id.header_bg);
-        ViewCompat.setOnApplyWindowInsetsListener(headerBg, (v, insets) -> {
-            final Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-            v.getLayoutParams().height = (int) (60 * getResources().getDisplayMetrics().density) + systemBars.top;
-            v.setPadding(0, systemBars.top, 0, 0);
-            v.requestLayout();
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            int statusH  = systemBars.top;
+            int base60px = (int) (60 * getResources().getDisplayMetrics().density);
+
+            View headerBg = findViewById(R.id.header_bg);
+            if (headerBg != null) {
+                headerBg.getLayoutParams().height = base60px + statusH;
+                headerBg.requestLayout();
+            }
+
+            View btnBack = findViewById(R.id.btn_back);
+            if (btnBack != null && btnBack.getLayoutParams() instanceof androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
+                androidx.constraintlayout.widget.ConstraintLayout.LayoutParams p = (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
+                p.topMargin = statusH;
+                btnBack.setLayoutParams(p);
+            }
+
+            View tvTitle = findViewById(R.id.tv_header_title);
+            if (tvTitle != null && tvTitle.getLayoutParams() instanceof androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
+                androidx.constraintlayout.widget.ConstraintLayout.LayoutParams p = (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) tvTitle.getLayoutParams();
+                p.topMargin = statusH;
+                tvTitle.setLayoutParams(p);
+            }
             return insets;
         });
     }
