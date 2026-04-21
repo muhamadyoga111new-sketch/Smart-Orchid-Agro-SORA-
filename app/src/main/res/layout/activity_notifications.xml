@@ -31,17 +31,15 @@
 
     <TextView
         android:id="@+id/tv_header_title"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
         android:text="@string/notifikasi"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btn_back"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/header_bg" />
 
 
@@ -61,203 +59,11 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Notif 1: Tanah Kering — WARNING (Von Restorff: red left accent) -->
             <LinearLayout
+                android:id="@+id/container_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_notif_warning"
-                android:elevation="2dp"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_warning"
-                    app:tint="@color/notif_warning"
-                    android:contentDescription="@string/notif_dry_title" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/notif_dry_title"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_main"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/notif_dry_desc"
-                        android:textSize="13sp"
-                        android:lineSpacingExtra="2dp"
-                        android:textColor="@color/text_sub" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/notif_time_now"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_caption" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Notif 2: Air Tangki Habis — WARNING (red accent) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_notif_warning"
-                android:elevation="2dp"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_warning"
-                    app:tint="@color/notif_warning"
-                    android:contentDescription="@string/notif_tank_title" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/notif_tank_title"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_main"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/notif_tank_desc"
-                        android:textSize="13sp"
-                        android:lineSpacingExtra="2dp"
-                        android:textColor="@color/text_sub" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/notif_time_10min"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_caption" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Notif 3: Tanah Lembap — SUCCESS (green accent) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_notif_success"
-                android:elevation="2dp"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_home"
-                    app:tint="@color/notif_success"
-                    android:contentDescription="@string/notif_moist_title" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/notif_moist_title"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_main"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/notif_moist_desc"
-                        android:textSize="13sp"
-                        android:textColor="@color/text_sub" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/notif_time_today"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_caption" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Notif 4: Pompa Menyala — INFO (blue accent) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_notif_info"
-                android:elevation="2dp"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_home"
-                    app:tint="@color/notif_info"
-                    android:contentDescription="@string/notif_pump_title" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/notif_pump_title"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_main"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/notif_pump_desc"
-                        android:textSize="13sp"
-                        android:textColor="@color/text_sub" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/notif_time_yesterday"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_caption" />
-                </LinearLayout>
-            </LinearLayout>
+                android:orientation="vertical" />
 
         </LinearLayout>
     </ScrollView>

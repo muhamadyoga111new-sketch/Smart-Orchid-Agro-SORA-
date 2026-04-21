@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
                         + "Sistem Penyiraman Anggrek Otomatis\n"
                         + "berbasis IoT.\n\n"
                         + "Versi: 1.0.0\n"
-                        + "© 2024 SORA Team")
+                        + "© 2026 SORA Team")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();

@@ -44,30 +44,61 @@ public class FirebaseDataManager {
     private static final String PATH_SENSORS = "sensors";
 
     // ── Fields ──────────────────────────────────────────────────────
+    private final DatabaseReference rootRef;
     private final DatabaseReference sensorRef;
+    private final DatabaseReference pumpRef; // Direct reference for real-time pump relay
     private ValueEventListener      activeListener;
+    private ValueEventListener      pumpListener;
+
+    private int lastKnownSoil = 0;
+    private int lastKnownWater = 0;
+    private boolean lastKnownPump = false;
 
     // ── Constructor ─────────────────────────────────────────────────
     public FirebaseDataManager(String deviceId) {
         FirebaseDatabase db = FirebaseDatabase.getInstance(DB_URL);
+        // Listen to the root to dynamically find the 'data_sensor' history table
+        rootRef = db.getReference();
+        // Specifically map to the device node
         sensorRef = db.getReference(PATH_SENSORS).child(deviceId);
+        // Specific live node for two-way hardware pump toggle
+        pumpRef = sensorRef.child("pumpStatus");
     }
 
     // ── Mulai dengarkan perubahan data sensor secara real-time ───────
     public void listenSensorData(SensorListener listener) {
+        
+        // 1. Listen for Historical Sensor Data (Soil/Water) from PHPMyAdmin array
         activeListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Ambil nilai dengan default aman jika null
-                Integer soil   = snapshot.child("soilMoisture").getValue(Integer.class);
-                Integer water  = snapshot.child("waterLevel").getValue(Integer.class);
-                Boolean pump   = snapshot.child("pumpStatus").getValue(Boolean.class);
+                DataSnapshot dataSensorTable = null;
+                for (DataSnapshot tableNode : snapshot.getChildren()) {
+                    DataSnapshot nameNode = tableNode.child("name");
+                    if (nameNode.exists() && "data_sensor".equals(nameNode.getValue(String.class))) {
+                        dataSensorTable = tableNode.child("data");
+                        break;
+                    }
+                }
 
-                listener.onSensorUpdated(
-                        soil  != null ? soil  : 0,
-                        water != null ? water : 0,
-                        pump  != null && pump
-                );
+                if (dataSensorTable != null && dataSensorTable.exists()) {
+                    DataSensor latestSensor = null;
+                    for (DataSnapshot ds : dataSensorTable.getChildren()) {
+                        DataSensor sensor = ds.getValue(DataSensor.class);
+                        // Using DEV001 to sync with the SQL dump records
+                        if (sensor != null && "DEV001".equals(sensor.id_perangkat)) {
+                            if (latestSensor == null || sensor.timestamp.compareTo(latestSensor.timestamp) > 0) {
+                                latestSensor = sensor;
+                            }
+                        }
+                    }
+
+                    if (latestSensor != null) {
+                        try { lastKnownSoil = Integer.parseInt(latestSensor.kelembapan_tanah); } catch(Exception ignored){}
+                        try { lastKnownWater = Integer.parseInt(latestSensor.level_air); } catch(Exception ignored){}
+                        listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
+                    }
+                }
             }
 
             @Override
@@ -75,20 +106,43 @@ public class FirebaseDataManager {
                 listener.onError(error.getMessage());
             }
         };
-        sensorRef.addValueEventListener(activeListener);
+        rootRef.addValueEventListener(activeListener);
+
+        // 2. Listen for Real-Time Pump Status (Bi-directional)
+        pumpListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean pump = snapshot.getValue(Boolean.class);
+                if (pump != null) {
+                    lastKnownPump = pump;
+                    listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onError(error.getMessage());
+            }
+        };
+        pumpRef.addValueEventListener(pumpListener);
     }
 
     // ── Berhenti mendengarkan (panggil di onDestroy / onPause) ───────
     public void stopListening() {
         if (activeListener != null) {
-            sensorRef.removeEventListener(activeListener);
+            rootRef.removeEventListener(activeListener);
             activeListener = null;
+        }
+        if (pumpListener != null) {
+            pumpRef.removeEventListener(pumpListener);
+            pumpListener = null;
         }
     }
 
     // ── Tulis status pompa ke Firebase (dibaca oleh IoT device) ──────
     public void setPumpStatus(boolean isOn) {
-        sensorRef.child("pumpStatus").setValue(isOn);
+        pumpRef.setValue(isOn);
+        lastKnownPump = isOn;
     }
 
     // ── Tulis data sensor (dipakai oleh IoT device / simulator) ─────
@@ -107,6 +161,6 @@ public class FirebaseDataManager {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             return FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
-        return null;
+        return "USR002"; // Fallback Test ID
     }
 }

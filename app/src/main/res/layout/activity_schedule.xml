@@ -271,21 +271,27 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Kalibrasi Sensor Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_kalibrasi"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="@string/sensor_calibration"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/nav_active"
-                app:cornerRadius="16dp" />
-
         </LinearLayout>
     </ScrollView>
+
+    <!-- Save Schedule Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save_schedule"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Simpan Jadwal"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="@color/nav_active"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom Navigation -->
     <LinearLayout

@@ -132,7 +132,7 @@ public class HistoryActivity extends AppCompatActivity {
                     }
                 }
 
-                Toast.makeText(HistoryActivity.this, "Total Riwayat: " + totalFetched + " | Berhasil Dimuat: " + validItems, Toast.LENGTH_SHORT).show();
+                // Toast removed
 
                 if (riwayatList.isEmpty()) {
                     // Optional: Show empty state text or just return

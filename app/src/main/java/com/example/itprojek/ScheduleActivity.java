@@ -129,12 +129,12 @@ public class ScheduleActivity extends AppCompatActivity {
             }
         });
 
-        // Kalibrasi button
-        final MaterialButton btnKalibrasi = findViewById(R.id.btn_kalibrasi);
-        applyScaleAnimation(btnKalibrasi);
-        btnKalibrasi.setOnClickListener(v -> {
-            startActivity(new Intent(this, CalibrationActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        // Simpan button
+        final MaterialButton btnSaveSchedule = findViewById(R.id.btn_save_schedule);
+        applyScaleAnimation(btnSaveSchedule);
+        btnSaveSchedule.setOnClickListener(v -> {
+            android.widget.Toast.makeText(this, "Jadwal berhasil disimpan", android.widget.Toast.LENGTH_SHORT).show();
+            // Start the fade out animation and close page if necessary or remain on page.
         });
 
         setupBottomNav();

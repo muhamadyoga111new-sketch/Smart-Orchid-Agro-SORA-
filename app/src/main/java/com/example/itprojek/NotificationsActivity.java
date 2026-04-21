@@ -11,6 +11,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -58,6 +59,70 @@ public class NotificationsActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
+        });
+
+        // Fetch Notifications from DB
+        fetchNotifications();
+    }
+
+    private void fetchNotifications() {
+        LinearLayout container = findViewById(R.id.container_notifications);
+        com.google.firebase.database.FirebaseDatabase db = com.google.firebase.database.FirebaseDatabase.getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        db.getReference().addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                com.google.firebase.database.DataSnapshot notifTable = null;
+                for (com.google.firebase.database.DataSnapshot tableNode : snapshot.getChildren()) {
+                    com.google.firebase.database.DataSnapshot nameNode = tableNode.child("name");
+                    if (nameNode.exists() && "notifikasi".equals(nameNode.getValue(String.class))) {
+                        notifTable = tableNode.child("data");
+                        break;
+                    }
+                }
+
+                if (notifTable != null && notifTable.exists()) {
+                    java.util.List<Notifikasi> dataList = new java.util.ArrayList<>();
+                    for (com.google.firebase.database.DataSnapshot ds : notifTable.getChildren()) {
+                        Notifikasi notif = ds.getValue(Notifikasi.class);
+                        if (notif != null && "USR002".equals(notif.id_pengguna)) {
+                            dataList.add(notif);
+                        }
+                    }
+
+                    java.util.Collections.sort(dataList);
+
+                    container.removeAllViews();
+                    for (Notifikasi n : dataList) {
+                        View card = getLayoutInflater().inflate(R.layout.item_notifikasi, container, false);
+
+                        TextView tvTitle = card.findViewById(R.id.tv_notif_title);
+                        TextView tvTime = card.findViewById(R.id.tv_notif_time);
+                        TextView tvMessage = card.findViewById(R.id.tv_notif_message);
+                        ImageView ivIcon = card.findViewById(R.id.iv_notif_icon);
+
+                        tvTitle.setText(n.judul != null ? n.judul : "Notifikasi");
+                        tvTime.setText(n.timestamp != null ? n.timestamp : "");
+                        tvMessage.setText(n.pesan != null ? n.pesan : "");
+
+                        // Dynamic icon/colors based on type
+                        if ("Tanah Kering".equals(n.tipe_alert) || "Tangki Rendah".equals(n.tipe_alert)) {
+                            ivIcon.setImageResource(R.drawable.ic_warning);
+                            ivIcon.setColorFilter(android.graphics.Color.parseColor("#EF5350"));
+                        } else if ("Kelembapan Tinggi".equals(n.tipe_alert)) {
+                            ivIcon.setImageResource(R.drawable.ic_info);
+                            ivIcon.setColorFilter(android.graphics.Color.parseColor("#29B6F6"));
+                        } else {
+                            ivIcon.setImageResource(R.drawable.ic_notification);
+                        }
+
+                        container.addView(card);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+            }
         });
     }
 

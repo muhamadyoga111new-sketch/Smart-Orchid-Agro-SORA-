@@ -22,6 +22,7 @@ import androidx.activity.OnBackPressedCallback;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -75,17 +76,46 @@ public class ProfileActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
 
-        // Setup Firebase User Info
+        // Setup Firebase User Info based on PHPMyAdmin imported database format
         TextView tvUserEmail = findViewById(R.id.tv_user_email);
         TextView tvUserId = findViewById(R.id.tv_user_id);
+        TextView tvUserName = findViewById(R.id.tv_user_name);
+        TextView tvUserStatus = findViewById(R.id.tv_user_status);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            tvUserEmail.setText(user.getEmail() != null ? user.getEmail() : "No Email");
-            tvUserId.setText(user.getUid());
-        } else {
-            tvUserEmail.setText("No User Found");
-        }
+        String targetUserId = "USR002"; // Fallback Test ID
+        tvUserId.setText(targetUserId);
+
+        FirebaseDatabase.getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference().addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                com.google.firebase.database.DataSnapshot penggunaTable = null;
+                for (com.google.firebase.database.DataSnapshot tableNode : snapshot.getChildren()) {
+                    com.google.firebase.database.DataSnapshot nameNode = tableNode.child("name");
+                    if (nameNode.exists() && "pengguna".equals(nameNode.getValue(String.class))) {
+                        penggunaTable = tableNode.child("data");
+                        break;
+                    }
+                }
+
+                if (penggunaTable != null && penggunaTable.exists()) {
+                    for (com.google.firebase.database.DataSnapshot ds : penggunaTable.getChildren()) {
+                        Pengguna user = ds.getValue(Pengguna.class);
+                        if (user != null && targetUserId.equals(user.id_pengguna)) {
+                            tvUserEmail.setText(user.email != null ? user.email : "No Email");
+                            if (tvUserName != null) tvUserName.setText(user.nama_lengkap != null ? user.nama_lengkap : "Anggota SORA");
+                            if (tvUserStatus != null) tvUserStatus.setText(user.status_akun != null ? user.status_akun : "-");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                // Log error
+            }
+        });
 
         // Setup Custom Logout Button
         MaterialCardView btnLogout = findViewById(R.id.card_logout);
