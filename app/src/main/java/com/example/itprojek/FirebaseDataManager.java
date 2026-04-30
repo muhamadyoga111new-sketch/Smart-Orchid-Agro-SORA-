@@ -127,6 +127,78 @@ public class FirebaseDataManager {
         pumpRef.addValueEventListener(pumpListener);
     }
 
+    // ── Ambil data sensor sekali (untuk periodic polling) ────────────
+    /**
+     * Baca data sensor dari Firebase sekali (non-real-time).
+     * Digunakan bersama Handler/postDelayed untuk polling tiap 30 menit.
+     */
+    public void fetchSensorDataOnce(SensorListener listener) {
+        rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DataSnapshot dataSensorTable = null;
+                for (DataSnapshot tableNode : snapshot.getChildren()) {
+                    DataSnapshot nameNode = tableNode.child("name");
+                    if (nameNode.exists() && "data_sensor".equals(nameNode.getValue(String.class))) {
+                        dataSensorTable = tableNode.child("data");
+                        break;
+                    }
+                }
+
+                if (dataSensorTable != null && dataSensorTable.exists()) {
+                    DataSensor latestSensor = null;
+                    for (DataSnapshot ds : dataSensorTable.getChildren()) {
+                        DataSensor sensor = ds.getValue(DataSensor.class);
+                        if (sensor != null && "DEV001".equals(sensor.id_perangkat)) {
+                            if (latestSensor == null || sensor.timestamp.compareTo(latestSensor.timestamp) > 0) {
+                                latestSensor = sensor;
+                            }
+                        }
+                    }
+
+                    if (latestSensor != null) {
+                        try { lastKnownSoil = Integer.parseInt(latestSensor.kelembapan_tanah); } catch (Exception ignored) {}
+                        try { lastKnownWater = Integer.parseInt(latestSensor.level_air); } catch (Exception ignored) {}
+                        listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onError(error.getMessage());
+            }
+        });
+    }
+
+    // ── Mulai listener real-time khusus status pompa ─────────────────
+    /**
+     * Listener real-time hanya untuk pumpStatus.
+     * Dipisah agar sensor data bisa di-poll secara berkala,
+     * sementara pompa tetap sinkron dua arah secara real-time.
+     */
+    public void startPumpListener(SensorListener listener) {
+        if (pumpListener != null) {
+            pumpRef.removeEventListener(pumpListener);
+        }
+        pumpListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean pump = snapshot.getValue(Boolean.class);
+                if (pump != null) {
+                    lastKnownPump = pump;
+                    listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onError(error.getMessage());
+            }
+        };
+        pumpRef.addValueEventListener(pumpListener);
+    }
+
     // ── Berhenti mendengarkan (panggil di onDestroy / onPause) ───────
     public void stopListening() {
         if (activeListener != null) {

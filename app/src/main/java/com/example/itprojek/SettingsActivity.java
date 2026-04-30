@@ -43,17 +43,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         itemSchedule.setOnClickListener(v -> {
             startActivity(new Intent(this, ScheduleActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         itemCalibration.setOnClickListener(v -> {
             startActivity(new Intent(this, CalibrationActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         itemNotifAlert.setOnClickListener(v -> {
             startActivity(new Intent(this, NotifAlertActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         // Bottom Navigation — tab switch (crossfade)
@@ -132,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     @Override

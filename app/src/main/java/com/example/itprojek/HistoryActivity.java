@@ -1,5 +1,6 @@
 package com.example.itprojek;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.LayoutInflater;
@@ -45,8 +47,15 @@ import androidx.core.view.WindowInsetsCompat;
 public class HistoryActivity extends AppCompatActivity {
 
     private LinearLayout containerHistory;
+    private LinearLayout containerSensor;
+    private ScrollView   scrollWatering;
+    private ScrollView   scrollSensor;
+    private TextView     tabWatering;
+    private TextView     tabSensorBtn;
+    private View         tabIndicator;
     private DatabaseReference riwayatRef;
     private ValueEventListener historyListener;
+    private ValueEventListener sensorHistoryListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,19 +66,51 @@ public class HistoryActivity extends AppCompatActivity {
         applyStatusBarInsets();
 
         containerHistory = findViewById(R.id.container_history);
+        containerSensor  = findViewById(R.id.container_sensor);
+        scrollWatering   = findViewById(R.id.scroll_watering);
+        scrollSensor     = findViewById(R.id.scroll_sensor);
+        tabWatering      = findViewById(R.id.tab_watering);
+        tabSensorBtn     = findViewById(R.id.tab_sensor);
+        tabIndicator     = findViewById(R.id.tab_indicator);
 
-        // Firebase Initialization
+        // Firebase
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        // Fetch from ROOT, since PHPMyAdmin arrays can shuffle indexes
         riwayatRef = db.getReference();
 
         fetchHistoryData();
+        fetchSensorHistoryData();
+
+        // Tab: Penyiraman
+        tabWatering.setOnClickListener(v -> {
+            scrollWatering.setVisibility(View.VISIBLE);
+            scrollSensor.setVisibility(View.GONE);
+            tabWatering.setTextColor(getResources().getColor(R.color.nav_active, getTheme()));
+            tabWatering.setTypeface(null, android.graphics.Typeface.BOLD);
+            tabSensorBtn.setTextColor(getResources().getColor(R.color.text_sub, getTheme()));
+            tabSensorBtn.setTypeface(null, android.graphics.Typeface.NORMAL);
+            tabIndicator.post(() ->
+                ObjectAnimator.ofFloat(tabIndicator, "translationX", tabIndicator.getTranslationX(), 0f)
+                        .setDuration(200).start());
+        });
+
+        // Tab: Data Sensor
+        tabSensorBtn.setOnClickListener(v -> {
+            scrollWatering.setVisibility(View.GONE);
+            scrollSensor.setVisibility(View.VISIBLE);
+            tabSensorBtn.setTextColor(getResources().getColor(R.color.nav_active, getTheme()));
+            tabSensorBtn.setTypeface(null, android.graphics.Typeface.BOLD);
+            tabWatering.setTextColor(getResources().getColor(R.color.text_sub, getTheme()));
+            tabWatering.setTypeface(null, android.graphics.Typeface.NORMAL);
+            tabIndicator.post(() ->
+                ObjectAnimator.ofFloat(tabIndicator, "translationX", tabIndicator.getTranslationX(),
+                        (float) tabIndicator.getWidth()).setDuration(200).start());
+        });
 
         // Back button
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Bottom Navigation — tab switch (crossfade)
+        // Bottom Navigation
         LinearLayout navHome = findViewById(R.id.nav_home);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
         LinearLayout navSettings = findViewById(R.id.nav_settings);
@@ -83,13 +124,11 @@ public class HistoryActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
-
         navNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
-
         navSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -205,11 +244,136 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
+    // ── Fetch riwayat data sensor dari Firebase ──────────────────────
+    private void fetchSensorHistoryData() {
+        sensorHistoryListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (containerSensor == null) return;
+                containerSensor.removeAllViews();
+
+                DataSnapshot dataSensorTable = null;
+                for (DataSnapshot tableNode : snapshot.getChildren()) {
+                    DataSnapshot nameNode = tableNode.child("name");
+                    if (nameNode.exists() && "data_sensor".equals(nameNode.getValue(String.class))) {
+                        dataSensorTable = tableNode.child("data");
+                        break;
+                    }
+                }
+
+                if (dataSensorTable == null || !dataSensorTable.exists()) {
+                    showEmptyState(containerSensor, "Belum ada data sensor tersimpan.");
+                    return;
+                }
+
+                List<DataSensor> sensorList = new ArrayList<>();
+                for (DataSnapshot ds : dataSensorTable.getChildren()) {
+                    DataSensor sensor = ds.getValue(DataSensor.class);
+                    if (sensor != null && "DEV001".equals(sensor.id_perangkat)) {
+                        sensorList.add(sensor);
+                    }
+                }
+
+                if (sensorList.isEmpty()) {
+                    showEmptyState(containerSensor, "Belum ada data sensor tersimpan.");
+                    return;
+                }
+
+                // Sort terbaru dulu
+                Collections.sort(sensorList, (a, b) -> {
+                    if (a.timestamp == null || b.timestamp == null) return 0;
+                    return b.timestamp.compareTo(a.timestamp);
+                });
+
+                // Kelompokkan per tanggal (10 karakter pertama timestamp)
+                Map<String, List<DataSensor>> grouped = new HashMap<>();
+                for (DataSensor s : sensorList) {
+                    String dateKey = (s.timestamp != null && s.timestamp.length() >= 10)
+                            ? s.timestamp.substring(0, 10) : "Unknown";
+                    if (!grouped.containsKey(dateKey)) grouped.put(dateKey, new ArrayList<>());
+                    grouped.get(dateKey).add(s);
+                }
+
+                List<String> sortedDates = new ArrayList<>(grouped.keySet());
+                Collections.sort(sortedDates, Collections.reverseOrder());
+
+                LayoutInflater inflater = LayoutInflater.from(HistoryActivity.this);
+
+                for (String dateKey : sortedDates) {
+                    // Header tanggal
+                    View headerView = inflater.inflate(R.layout.item_riwayat_header, containerSensor, false);
+                    TextView tvTanggal = headerView.findViewById(R.id.tv_tanggal);
+                    tvTanggal.setText(formatDateIndo(dateKey));
+                    containerSensor.addView(headerView);
+
+                    for (DataSensor s : grouped.get(dateKey)) {
+                        View cardView = inflater.inflate(R.layout.item_sensor_card, containerSensor, false);
+
+                        TextView tvTime       = cardView.findViewById(R.id.tv_sensor_timestamp);
+                        TextView tvKelembapan = cardView.findViewById(R.id.tv_sensor_kelembapan);
+                        TextView tvAir        = cardView.findViewById(R.id.tv_sensor_air);
+                        TextView tvStatus     = cardView.findViewById(R.id.tv_sensor_status);
+                        View     accent       = cardView.findViewById(R.id.view_sensor_accent);
+
+                        tvTime.setText(formatTime(s.timestamp));
+                        tvKelembapan.setText(s.kelembapan_tanah != null ? s.kelembapan_tanah + "%" : "--");
+                        tvAir.setText(s.level_air != null ? s.level_air + "%" : "--");
+
+                        String status = (s.status_kelembapan != null) ? s.status_kelembapan : "-";
+                        tvStatus.setText("Status: " + status);
+
+                        if (accent != null) {
+                            if ("kering".equalsIgnoreCase(status)) {
+                                accent.setBackgroundColor(Color.parseColor("#EF5350"));
+                            } else if ("lembap".equalsIgnoreCase(status) || "lembab".equalsIgnoreCase(status)) {
+                                accent.setBackgroundColor(Color.parseColor("#42A5F5"));
+                            } else {
+                                accent.setBackgroundColor(Color.parseColor("#43A047"));
+                            }
+                        }
+
+                        containerSensor.addView(cardView);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showEmptyState(containerSensor, "Gagal memuat data sensor.");
+            }
+        };
+        riwayatRef.addValueEventListener(sensorHistoryListener);
+    }
+
+    private void showEmptyState(LinearLayout container, String message) {
+        if (container == null) return;
+        container.removeAllViews();
+        TextView tv = new TextView(this);
+        tv.setText(message);
+        tv.setTextColor(Color.parseColor("#9E9E9E"));
+        tv.setTextSize(14);
+        tv.setPadding(0, 48, 0, 0);
+        tv.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+        container.addView(tv);
+    }
+
+    /** Ambil jam:menit dari timestamp "yyyy-MM-dd HH:mm:ss" atau "yyyy-MM-ddTHH:mm:ss". */
+    private String formatTime(String timestamp) {
+        if (timestamp == null || timestamp.length() < 16) return "--:--";
+        String timePart = timestamp.contains("T")
+                ? timestamp.substring(11, 16)
+                : timestamp.substring(11, 16);
+        return timePart;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (riwayatRef != null && historyListener != null) {
             riwayatRef.removeEventListener(historyListener);
+        }
+        if (riwayatRef != null && sensorHistoryListener != null) {
+            riwayatRef.removeEventListener(sensorHistoryListener);
         }
     }
 
@@ -268,7 +432,7 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
@@ -37,11 +39,22 @@ public class MainActivity extends AppCompatActivity {
     private PrefManager         pref;
     private DrawerLayout        drawerLayout;
     private FirebaseDataManager dataManager;
+    private int                 lastSoilMoisture = 0;
     private MaterialSwitch      switchPump;
     private TextView            tvPumpStatus;
     private MaterialSwitch      switchEmergency;
+    private MaterialSwitch      switchAutoMode;
+    private TextView            tvAutoThreshold;
     private boolean             isEmergencyUpdating = false;
     private boolean             isPumpUpdating = false;
+    private boolean             isAutoMode = false;
+    private boolean             isAutoUpdating = false;
+
+    // ── Periodic Sensor Polling ──────────────────────────────────────
+    private Handler  sensorHandler;
+    private Runnable sensorPollRunnable;
+    /** Interval pengambilan data sensor: 30 menit = 30 × 60 × 1000 ms */
+    private static final long SENSOR_INTERVAL_MS = 30 * 60 * 1000L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,30 +100,28 @@ public class MainActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             drawerLayout.closeDrawer(GravityCompat.START);
-            drawerLayout.postDelayed(() -> {
-                if (id == R.id.drawer_home) {
-                    // Already on home
-                } else if (id == R.id.drawer_history) {
-                    startActivity(new Intent(this, HistoryActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_notifications) {
-                    startActivity(new Intent(this, NotificationsActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_settings) {
-                    startActivity(new Intent(this, SettingsActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_profile) {
-                    startActivity(new Intent(this, ProfileActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_detail) {
-                    startActivity(new Intent(this, DetailActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else if (id == R.id.drawer_about) {
-                    showAboutDialog();
-                } else if (id == R.id.drawer_logout) {
-                    logout();
-                }
-            }, 300);
+            if (id == R.id.drawer_home) {
+                // Already on home
+            } else if (id == R.id.drawer_history) {
+                startActivity(new Intent(this, HistoryActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (id == R.id.drawer_notifications) {
+                startActivity(new Intent(this, NotificationsActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (id == R.id.drawer_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (id == R.id.drawer_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (id == R.id.drawer_detail) {
+                startActivity(new Intent(this, DetailActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (id == R.id.drawer_about) {
+                showAboutDialog();
+            } else if (id == R.id.drawer_logout) {
+                logout();
+            }
             return true;
         });
 
@@ -158,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView btnNotification = findViewById(R.id.btn_notification_top);
         btnNotification.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         // === Sensor cards → DetailActivity ===
@@ -166,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         com.google.android.material.card.MaterialCardView cardWater    = findViewById(R.id.card_water);
         android.view.View.OnClickListener goToDetail = v -> {
             startActivity(new Intent(this, DetailActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         };
         if (cardMoisture != null) cardMoisture.setOnClickListener(goToDetail);
         if (cardWater    != null) cardWater.setOnClickListener(goToDetail);
@@ -205,51 +216,82 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-        // === Sensor data real-time dari Firebase ===
-        dataManager.listenSensorData(new FirebaseDataManager.SensorListener() {
+        // === Auto Mode Switch ===
+        switchAutoMode   = findViewById(R.id.switch_auto_mode);
+        tvAutoThreshold  = findViewById(R.id.tv_auto_threshold);
+
+        // Baca status auto mode dari SharedPreferences
+        isAutoMode = pref.getBoolean("AUTO_MODE", false);
+        isAutoUpdating = true;
+        switchAutoMode.setChecked(isAutoMode);
+        isAutoUpdating = false;
+        switchPump.setEnabled(!isAutoMode);
+        updateAutoThresholdLabel();
+
+        switchAutoMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isAutoUpdating) return;
+            isAutoMode = isChecked;
+            pref.saveBoolean("AUTO_MODE", isAutoMode);
+            // Disable/enable manual pump switch
+            switchPump.setEnabled(!isAutoMode);
+            updateAutoThresholdLabel();
+            if (isAutoMode) {
+                // Langsung cek kondisi berdasarkan nilai sensor terakhir
+                checkAutoWatering(lastSoilMoisture);
+            }
+        });
+
+        // === Sensor Polling tiap 30 menit ===
+        // Callback bersama untuk polling sensor & pump listener
+        FirebaseDataManager.SensorListener sensorCallback = new FirebaseDataManager.SensorListener() {
             @Override
             public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
-                // Update UI sensor kelembapan tanah
-                TextView tvMoistureValue = findViewById(R.id.tv_moisture_value);
-                if (tvMoistureValue != null) {
-                    tvMoistureValue.setText(soilMoisture + "%");
-                }
+                lastSoilMoisture = soilMoisture;
+                updateSensorUI(soilMoisture, waterLevel);
 
-                // Update UI level air
-                TextView tvWaterValue = findViewById(R.id.tv_water_value);
-                if (tvWaterValue != null) {
-                    tvWaterValue.setText(waterLevel + "%");
-                }
-
-                View waterFill = findViewById(R.id.water_fill);
-                View tankOutline = findViewById(R.id.tank_outline);
-                if (waterFill != null && tankOutline != null) {
-                    Runnable updateHeight = () -> {
-                        waterFill.getLayoutParams().height = (int) (tankOutline.getHeight() * (waterLevel / 100f));
-                        waterFill.requestLayout();
-                    };
-                    if (tankOutline.getHeight() > 0) {
-                        updateHeight.run();
-                    } else {
-                        tankOutline.post(updateHeight);
+                if (isAutoMode) {
+                    checkAutoWatering(soilMoisture);
+                    // Tetap reflect perubahan pompa dari hardware di UI
+                    if (switchPump.isChecked() != pumpStatus) {
+                        isPumpUpdating = true;
+                        switchPump.setChecked(pumpStatus);
+                        isPumpUpdating = false;
+                        updatePumpStatusUI(tvPumpStatus, pumpStatus);
                     }
-                }
-
-                // Sync status pompa dari Firebase ke UI
-                if (switchPump.isChecked() != pumpStatus) {
-                    isPumpUpdating = true;
-                    switchPump.setChecked(pumpStatus);
-                    isPumpUpdating = false;
-                    pref.saveBoolean("STATUS_POMPA", pumpStatus);
-                    updatePumpStatusUI(tvPumpStatus, pumpStatus);
+                } else {
+                    // Mode manual: sync pompa dari Firebase ke UI
+                    if (switchPump.isChecked() != pumpStatus) {
+                        isPumpUpdating = true;
+                        switchPump.setChecked(pumpStatus);
+                        isPumpUpdating = false;
+                        pref.saveBoolean("STATUS_POMPA", pumpStatus);
+                        updatePumpStatusUI(tvPumpStatus, pumpStatus);
+                    }
                 }
             }
 
             @Override
             public void onError(String errorMessage) {
-                android.util.Log.w("SORA-DB", "Realtime DB error: " + errorMessage);
+                android.util.Log.w("SORA-DB", "Sensor error: " + errorMessage);
             }
-        });
+        };
+
+        // Polling sensor (soil & water) setiap 30 menit
+        sensorHandler = new Handler(Looper.getMainLooper());
+        sensorPollRunnable = new Runnable() {
+            @Override
+            public void run() {
+                android.util.Log.d("SORA-POLL", "Mengambil data sensor...");
+                dataManager.fetchSensorDataOnce(sensorCallback);
+                // Jadwalkan polling berikutnya
+                sensorHandler.postDelayed(this, SENSOR_INTERVAL_MS);
+            }
+        };
+        // Fetch segera saat app dibuka, lalu tiap 30 menit
+        sensorHandler.post(sensorPollRunnable);
+
+        // Pump status tetap real-time (sinkron dua arah dengan hardware)
+        dataManager.startPumpListener(sensorCallback);
 
         // === Emergency Stop Section ===
         switchEmergency = findViewById(R.id.switch_emergency);
@@ -310,6 +352,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Hentikan periodic polling sensor
+        if (sensorHandler != null && sensorPollRunnable != null) {
+            sensorHandler.removeCallbacks(sensorPollRunnable);
+        }
+        // Hentikan Firebase listeners (pump real-time)
         if (dataManager != null) dataManager.stopListening();
     }
 
@@ -351,6 +398,93 @@ public class MainActivity extends AppCompatActivity {
     private void updatePumpStatusUI(TextView tvPumpStatus, boolean isOn) {
         tvPumpStatus.setText(isOn ? getString(R.string.on) : getString(R.string.off));
         tvPumpStatus.setTextColor(Color.parseColor(isOn ? "#43A047" : "#EF5350"));
+    }
+
+    /**
+     * Perbarui tampilan UI sensor (kelembapan tanah & level air).
+     * Dipanggil setiap kali polling 30 menit berhasil.
+     */
+    private void updateSensorUI(int soilMoisture, int waterLevel) {
+        // Gauge kelembapan
+        SoilGaugeView gauge = findViewById(R.id.soil_gauge);
+        if (gauge != null) gauge.setPercentage(soilMoisture);
+
+        // Nilai level air
+        TextView tvWaterValue = findViewById(R.id.tv_water_value);
+        if (tvWaterValue != null) tvWaterValue.setText(waterLevel + "%");
+
+        // Tangki air visual
+        View waterFill   = findViewById(R.id.water_fill);
+        View tankOutline = findViewById(R.id.tank_outline);
+        if (waterFill != null && tankOutline != null) {
+            Runnable updateHeight = () -> {
+                waterFill.getLayoutParams().height = (int) (tankOutline.getHeight() * (waterLevel / 100f));
+                waterFill.requestLayout();
+            };
+            if (tankOutline.getHeight() > 0) {
+                updateHeight.run();
+            } else {
+                tankOutline.post(updateHeight);
+            }
+        }
+    }
+
+
+    /**
+     * Cek apakah penyiraman otomatis perlu diaktifkan/dinonaktifkan
+     * berdasarkan nilai kelembapan tanah dan threshold kalibrasi.
+     *
+     * Logika:
+     *   - soilMoisture < KALIBRASI_KERING  → pompa ON  (tanah terlalu kering)
+     *   - soilMoisture >= KALIBRASI_NORMAL → pompa OFF (tanah sudah cukup lembap)
+     *   - di antara keduanya               → biarkan status pompa saat ini
+     *
+     * Emergency Stop selalu mengesampingkan auto-watering.
+     */
+    private void checkAutoWatering(int soilMoisture) {
+        if (!isAutoMode) return;
+
+        // Jika Emergency Stop aktif, jangan nyalakan pompa otomatis
+        if (switchEmergency != null && switchEmergency.isChecked()) return;
+
+        int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
+        int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
+
+        boolean currentPump = switchPump.isChecked();
+
+        if (soilMoisture < thresholdKering && !currentPump) {
+            // Tanah kering → nyalakan pompa
+            android.util.Log.d("SORA-AUTO", "Auto: Tanah kering (" + soilMoisture + "% < " + thresholdKering + "%), pompa ON");
+            isPumpUpdating = true;
+            switchPump.setChecked(true);
+            isPumpUpdating = false;
+            pref.saveBoolean("STATUS_POMPA", true);
+            updatePumpStatusUI(tvPumpStatus, true);
+            dataManager.setPumpStatus(true);
+        } else if (soilMoisture >= thresholdNormal && currentPump) {
+            // Tanah sudah lembap → matikan pompa
+            android.util.Log.d("SORA-AUTO", "Auto: Tanah lembap (" + soilMoisture + "% >= " + thresholdNormal + "%), pompa OFF");
+            isPumpUpdating = true;
+            switchPump.setChecked(false);
+            isPumpUpdating = false;
+            pref.saveBoolean("STATUS_POMPA", false);
+            updatePumpStatusUI(tvPumpStatus, false);
+            dataManager.setPumpStatus(false);
+        }
+    }
+
+    /**
+     * Update label info threshold di bawah switch Mode Otomatis.
+     */
+    private void updateAutoThresholdLabel() {
+        if (tvAutoThreshold == null) return;
+        int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
+        int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
+        if (isAutoMode) {
+            tvAutoThreshold.setText("Siram jika tanah < " + thresholdKering + "%, stop >= " + thresholdNormal + "%");
+        } else {
+            tvAutoThreshold.setText("Siram jika tanah < " + thresholdKering + "%");
+        }
     }
 
     private void applyScaleAnimation(View view) {

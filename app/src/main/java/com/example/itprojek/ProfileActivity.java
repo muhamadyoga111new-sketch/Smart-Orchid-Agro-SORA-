@@ -37,7 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void handleOnBackPressed() {
                 finish();
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -73,7 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> {
             finish();
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         // Setup Firebase User Info based on PHPMyAdmin imported database format
