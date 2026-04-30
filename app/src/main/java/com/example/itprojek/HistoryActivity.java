@@ -212,13 +212,28 @@ public class HistoryActivity extends AppCompatActivity {
                         View cardView = inflater.inflate(R.layout.item_riwayat_card, containerHistory, false);
                         
                         TextView tvDetail = cardView.findViewById(R.id.tv_history_detail);
+                        TextView tvMoisture = cardView.findViewById(R.id.tv_history_moisture);
+                        TextView tvWater = cardView.findViewById(R.id.tv_history_water);
+                        
                         String dur = item.getDurasi_aktual() != null ? item.getDurasi_aktual() : "0";
                         String start = item.getWaktu_mulai() != null && item.getWaktu_mulai().length() >= 5 
                                 ? item.getWaktu_mulai().substring(0, 5) : "--:--";
                         String end = item.getWaktu_selesai() != null && item.getWaktu_selesai().length() >= 5 
                                 ? item.getWaktu_selesai().substring(0, 5) : "--:--";
                         
+                        String beforeM = item.getKelembapan_sebelum() != null ? item.getKelembapan_sebelum() : "--";
+                        String afterM = item.getKelembapan_sesudah() != null ? item.getKelembapan_sesudah() : "--";
+                        
+                        String beforeW = item.getLevel_air_sebelum() != null ? item.getLevel_air_sebelum() : "--";
+                        String afterW = item.getLevel_air_sesudah() != null ? item.getLevel_air_sesudah() : "--";
+                        
                         tvDetail.setText(start + " - " + end + " · Durasi: " + dur + " menit");
+                        if (tvMoisture != null) {
+                            tvMoisture.setText("Kelembapan: " + beforeM + "% ➔ " + afterM + "%");
+                        }
+                        if (tvWater != null) {
+                            tvWater.setText("Ketinggian Air: " + beforeW + "% ➔ " + afterW + "%");
+                        }
                         
                         containerHistory.addView(cardView);
                     }

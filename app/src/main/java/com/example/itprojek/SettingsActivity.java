@@ -33,18 +33,15 @@ public class SettingsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Settings menu items — push navigation (slide like Instagram detail)
-        LinearLayout itemSchedule = findViewById(R.id.item_schedule);
         LinearLayout itemCalibration = findViewById(R.id.item_calibration);
         LinearLayout itemNotifAlert = findViewById(R.id.item_notif_alert);
+        LinearLayout itemAbout = findViewById(R.id.item_about);
 
-        applyScaleAnimation(itemSchedule);
         applyScaleAnimation(itemCalibration);
         applyScaleAnimation(itemNotifAlert);
+        applyScaleAnimation(itemAbout);
 
-        itemSchedule.setOnClickListener(v -> {
-            startActivity(new Intent(this, ScheduleActivity.class));
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        });
+        itemAbout.setOnClickListener(v -> showAboutDialog());
 
         itemCalibration.setOnClickListener(v -> {
             startActivity(new Intent(this, CalibrationActivity.class));
@@ -133,6 +130,25 @@ public class SettingsActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
+
+    private void showAboutDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Tentang Aplikasi")
+                .setMessage("SORA - Smart Orchid Agro\n\n"
+                        + "Sistem Penyiraman Anggrek Otomatis\n"
+                        + "berbasis IoT.\n\n"
+                        + "Tim Pengembang:\n"
+                        + "- Muhammad Yoga\n"
+                        + "- Muhammad Naufal Nijami\n"
+                        + "- Muhammad Rhojani\n"
+                        + "- Devi Pusparina\n"
+                        + "- Nurlaila\n\n"
+                        + "Versi: 1.0.0\n"
+                        + "© 2026 SORA Team")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
     @Override

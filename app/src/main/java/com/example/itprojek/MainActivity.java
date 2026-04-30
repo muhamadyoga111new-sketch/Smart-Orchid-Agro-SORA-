@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     // ── Periodic Sensor Polling ──────────────────────────────────────
     private Handler  sensorHandler;
     private Runnable sensorPollRunnable;
-    /** Interval pengambilan data sensor: 30 menit = 30 × 60 × 1000 ms */
-    private static final long SENSOR_INTERVAL_MS = 30 * 60 * 1000L;
+    /** Interval pengambilan data sensor: 1 menit = 1 × 60 × 1000 ms */
+    private static final long SENSOR_INTERVAL_MS = 1 * 60 * 1000L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // === Sensor Polling tiap 30 menit ===
+        // === Sensor Polling tiap 1 menit ===
         // Callback bersama untuk polling sensor & pump listener
         FirebaseDataManager.SensorListener sensorCallback = new FirebaseDataManager.SensorListener() {
             @Override
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // Polling sensor (soil & water) setiap 30 menit
+        // Polling sensor (soil & water) setiap 1 menit
         sensorHandler = new Handler(Looper.getMainLooper());
         sensorPollRunnable = new Runnable() {
             @Override
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                 sensorHandler.postDelayed(this, SENSOR_INTERVAL_MS);
             }
         };
-        // Fetch segera saat app dibuka, lalu tiap 30 menit
+        // Fetch segera saat app dibuka, lalu tiap 1 menit
         sensorHandler.post(sensorPollRunnable);
 
         // Pump status tetap real-time (sinkron dua arah dengan hardware)
@@ -366,6 +366,12 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage("SORA - Smart Orchid Agro\n\n"
                         + "Sistem Penyiraman Anggrek Otomatis\n"
                         + "berbasis IoT.\n\n"
+                        + "Tim Pengembang:\n"
+                        + "- Muhammad Yoga\n"
+                        + "- Muhammad Naufal Nijami\n"
+                        + "- Muhammad Rhojani\n"
+                        + "- Devi Pusparina\n"
+                        + "- Nurlaila\n\n"
                         + "Versi: 1.0.0\n"
                         + "© 2026 SORA Team")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
@@ -402,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Perbarui tampilan UI sensor (kelembapan tanah & level air).
-     * Dipanggil setiap kali polling 30 menit berhasil.
+     * Dipanggil setiap kali polling 1 menit berhasil.
      */
     private void updateSensorUI(int soilMoisture, int waterLevel) {
         // Gauge kelembapan

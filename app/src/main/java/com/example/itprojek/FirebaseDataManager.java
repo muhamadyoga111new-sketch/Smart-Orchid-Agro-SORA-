@@ -130,7 +130,7 @@ public class FirebaseDataManager {
     // ── Ambil data sensor sekali (untuk periodic polling) ────────────
     /**
      * Baca data sensor dari Firebase sekali (non-real-time).
-     * Digunakan bersama Handler/postDelayed untuk polling tiap 30 menit.
+     * Digunakan bersama Handler/postDelayed untuk polling tiap 1 menit.
      */
     public void fetchSensorDataOnce(SensorListener listener) {
         rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
