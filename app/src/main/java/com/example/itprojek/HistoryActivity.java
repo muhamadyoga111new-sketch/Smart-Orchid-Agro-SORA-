@@ -53,7 +53,13 @@ public class HistoryActivity extends AppCompatActivity {
     private TextView     tabWatering;
     private TextView     tabSensorBtn;
     private View         tabIndicator;
-    private DatabaseReference riwayatRef;
+    private static final String DB_URL     = "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    private static final String DEVICE_ID  = "ANG-123456";
+
+    private DatabaseReference historyRef;
+    private DatabaseReference soilRef;   // sensors/soil
+    private DatabaseReference waterRef;  // sensors/water
+    private DatabaseReference pumpRef;   // sensors/pump
     private ValueEventListener historyListener;
     private ValueEventListener sensorHistoryListener;
 
@@ -74,8 +80,13 @@ public class HistoryActivity extends AppCompatActivity {
         tabIndicator     = findViewById(R.id.tab_indicator);
 
         // Firebase
-        FirebaseDatabase db = FirebaseDatabase.getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        riwayatRef = db.getReference();
+        FirebaseDatabase db = FirebaseDatabase.getInstance(DB_URL);
+        historyRef = db.getReference("history").child(DEVICE_ID);
+        // Baca setiap field sensor secara terpisah (tanpa butuh izin baca root)
+        DatabaseReference sensorsRoot = db.getReference("sensors");
+        soilRef  = sensorsRoot.child("soil");
+        waterRef = sensorsRoot.child("water");
+        pumpRef  = sensorsRoot.child("pump");
 
         fetchHistoryData();
         fetchSensorHistoryData();
@@ -141,40 +152,24 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (containerHistory == null) return;
-                containerHistory.removeAllViews(); // Clear dummy/old views
+                containerHistory.removeAllViews();
 
-                List<Riwayat> riwayatList = new ArrayList<>();
-                int totalFetched = 0;
-                int validItems = 0;
-
-                // Dynamically find the table where name == "riwayat_penyiraman"
-                DataSnapshot targetDataNode = null;
-                for (DataSnapshot tableNode : snapshot.getChildren()) {
-                    DataSnapshot nameNode = tableNode.child("name");
-                    if (nameNode.exists() && "riwayat_penyiraman".equals(nameNode.getValue(String.class))) {
-                        targetDataNode = tableNode.child("data");
-                        break;
-                    }
-                }
-
-                if (targetDataNode == null || !targetDataNode.exists()) {
-                    Toast.makeText(HistoryActivity.this, "Tabel riwayat_penyiraman tidak ditemukan di DB!", Toast.LENGTH_LONG).show();
+                if (!snapshot.exists() || !snapshot.hasChildren()) {
+                    showEmptyState(containerHistory, "Belum ada riwayat penyiraman.");
                     return;
                 }
 
-                for (DataSnapshot ds : targetDataNode.getChildren()) {
-                    totalFetched++;
+                List<Riwayat> riwayatList = new ArrayList<>();
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     Riwayat r = ds.getValue(Riwayat.class);
                     if (r != null && r.getTanggal() != null) {
                         riwayatList.add(r);
-                        validItems++;
                     }
                 }
 
-                // Toast removed
-
                 if (riwayatList.isEmpty()) {
-                    // Optional: Show empty state text or just return
+                    showEmptyState(containerHistory, "Belum ada riwayat penyiraman.");
                     return;
                 }
 
@@ -242,10 +237,11 @@ public class HistoryActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(HistoryActivity.this, "Gagal memuat riwayat", Toast.LENGTH_SHORT).show();
+                android.util.Log.e("SORA-DB", "fetchHistory CANCELLED: code=" + error.getCode() + " msg=" + error.getMessage());
+                showEmptyState(containerHistory, "Akses ditolak (" + error.getCode() + ").\nPeriksa Security Rules Firebase.");
             }
         };
-        riwayatRef.addValueEventListener(historyListener);
+        historyRef.addValueEventListener(historyListener);
     }
 
     private String formatDateIndo(String dateStr) {
@@ -259,105 +255,84 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
-    // ── Fetch riwayat data sensor dari Firebase ──────────────────────
+    // ── Fetch data sensor terkini — baca sensors/soil & sensors/water secara terpisah ──
+    private int  currentSoil  = 0;
+    private int  currentWater = 0;
+    private boolean currentPump = false;
+
     private void fetchSensorHistoryData() {
-        sensorHistoryListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (containerSensor == null) return;
-                containerSensor.removeAllViews();
-
-                DataSnapshot dataSensorTable = null;
-                for (DataSnapshot tableNode : snapshot.getChildren()) {
-                    DataSnapshot nameNode = tableNode.child("name");
-                    if (nameNode.exists() && "data_sensor".equals(nameNode.getValue(String.class))) {
-                        dataSensorTable = tableNode.child("data");
-                        break;
-                    }
-                }
-
-                if (dataSensorTable == null || !dataSensorTable.exists()) {
-                    showEmptyState(containerSensor, "Belum ada data sensor tersimpan.");
-                    return;
-                }
-
-                List<DataSensor> sensorList = new ArrayList<>();
-                for (DataSnapshot ds : dataSensorTable.getChildren()) {
-                    DataSensor sensor = ds.getValue(DataSensor.class);
-                    if (sensor != null && "DEV001".equals(sensor.id_perangkat)) {
-                        sensorList.add(sensor);
-                    }
-                }
-
-                if (sensorList.isEmpty()) {
-                    showEmptyState(containerSensor, "Belum ada data sensor tersimpan.");
-                    return;
-                }
-
-                // Sort terbaru dulu
-                Collections.sort(sensorList, (a, b) -> {
-                    if (a.timestamp == null || b.timestamp == null) return 0;
-                    return b.timestamp.compareTo(a.timestamp);
-                });
-
-                // Kelompokkan per tanggal (10 karakter pertama timestamp)
-                Map<String, List<DataSensor>> grouped = new HashMap<>();
-                for (DataSensor s : sensorList) {
-                    String dateKey = (s.timestamp != null && s.timestamp.length() >= 10)
-                            ? s.timestamp.substring(0, 10) : "Unknown";
-                    if (!grouped.containsKey(dateKey)) grouped.put(dateKey, new ArrayList<>());
-                    grouped.get(dateKey).add(s);
-                }
-
-                List<String> sortedDates = new ArrayList<>(grouped.keySet());
-                Collections.sort(sortedDates, Collections.reverseOrder());
-
-                LayoutInflater inflater = LayoutInflater.from(HistoryActivity.this);
-
-                for (String dateKey : sortedDates) {
-                    // Header tanggal
-                    View headerView = inflater.inflate(R.layout.item_riwayat_header, containerSensor, false);
-                    TextView tvTanggal = headerView.findViewById(R.id.tv_tanggal);
-                    tvTanggal.setText(formatDateIndo(dateKey));
-                    containerSensor.addView(headerView);
-
-                    for (DataSensor s : grouped.get(dateKey)) {
-                        View cardView = inflater.inflate(R.layout.item_sensor_card, containerSensor, false);
-
-                        TextView tvTime       = cardView.findViewById(R.id.tv_sensor_timestamp);
-                        TextView tvKelembapan = cardView.findViewById(R.id.tv_sensor_kelembapan);
-                        TextView tvAir        = cardView.findViewById(R.id.tv_sensor_air);
-                        TextView tvStatus     = cardView.findViewById(R.id.tv_sensor_status);
-                        View     accent       = cardView.findViewById(R.id.view_sensor_accent);
-
-                        tvTime.setText(formatTime(s.timestamp));
-                        tvKelembapan.setText(s.kelembapan_tanah != null ? s.kelembapan_tanah + "%" : "--");
-                        tvAir.setText(s.level_air != null ? s.level_air + "%" : "--");
-
-                        String status = (s.status_kelembapan != null) ? s.status_kelembapan : "-";
-                        tvStatus.setText("Status: " + status);
-
-                        if (accent != null) {
-                            if ("kering".equalsIgnoreCase(status)) {
-                                accent.setBackgroundColor(Color.parseColor("#EF5350"));
-                            } else if ("lembap".equalsIgnoreCase(status) || "lembab".equalsIgnoreCase(status)) {
-                                accent.setBackgroundColor(Color.parseColor("#42A5F5"));
-                            } else {
-                                accent.setBackgroundColor(Color.parseColor("#43A047"));
-                            }
-                        }
-
-                        containerSensor.addView(cardView);
-                    }
-                }
+        // Listener untuk sensors/soil
+        soilRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                if (s.getValue() instanceof Long)    currentSoil = ((Long) s.getValue()).intValue();
+                else if (s.getValue() instanceof Integer) currentSoil = (Integer) s.getValue();
+                updateSensorCard();
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                showEmptyState(containerSensor, "Gagal memuat data sensor.");
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                showEmptyState(containerSensor, "Akses ditolak (" + e.getCode() + ").\nPeriksa Security Rules Firebase.");
             }
-        };
-        riwayatRef.addValueEventListener(sensorHistoryListener);
+        });
+
+        // Listener untuk sensors/water
+        waterRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                if (s.getValue() instanceof Long)    currentWater = ((Long) s.getValue()).intValue();
+                else if (s.getValue() instanceof Integer) currentWater = (Integer) s.getValue();
+                updateSensorCard();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                showEmptyState(containerSensor, "Akses ditolak (" + e.getCode() + ").\nPeriksa Security Rules Firebase.");
+            }
+        });
+
+        // Listener untuk sensors/pump
+        pumpRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                Object v = s.getValue();
+                if (v instanceof Boolean) currentPump = (Boolean) v;
+                else if (v instanceof Long) currentPump = ((Long) v) != 0;
+                updateSensorCard();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) { /* ignore */ }
+        });
+    }
+
+    private void updateSensorCard() {
+        if (containerSensor == null) return;
+        containerSensor.removeAllViews();
+
+        String status;
+        if (currentSoil < 30)      status = "Kering";
+        else if (currentSoil < 60) status = "Normal";
+        else                       status = "Lembap";
+
+        LayoutInflater inflater = LayoutInflater.from(HistoryActivity.this);
+
+        // Header
+        View headerView = inflater.inflate(R.layout.item_riwayat_header, containerSensor, false);
+        TextView tvTanggal = headerView.findViewById(R.id.tv_tanggal);
+        tvTanggal.setText("Pembacaan Terkini");
+        containerSensor.addView(headerView);
+
+        // Kartu sensor
+        View cardView     = inflater.inflate(R.layout.item_sensor_card, containerSensor, false);
+        TextView tvTime       = cardView.findViewById(R.id.tv_sensor_timestamp);
+        TextView tvKelembapan = cardView.findViewById(R.id.tv_sensor_kelembapan);
+        TextView tvAir        = cardView.findViewById(R.id.tv_sensor_air);
+        TextView tvStatus     = cardView.findViewById(R.id.tv_sensor_status);
+        View     accent       = cardView.findViewById(R.id.view_sensor_accent);
+
+        if (tvTime       != null) tvTime.setText("Real-time");
+        if (tvKelembapan != null) tvKelembapan.setText(currentSoil + "%");
+        if (tvAir        != null) tvAir.setText(currentWater + "%");
+        if (tvStatus     != null) tvStatus.setText("Status: " + status + (currentPump ? "  ·  Pompa ON" : "  ·  Pompa OFF"));
+
+        if (accent != null) {
+            if ("Kering".equals(status))      accent.setBackgroundColor(Color.parseColor("#EF5350"));
+            else if ("Lembap".equals(status)) accent.setBackgroundColor(Color.parseColor("#42A5F5"));
+            else                              accent.setBackgroundColor(Color.parseColor("#43A047"));
+        }
+        containerSensor.addView(cardView);
     }
 
     private void showEmptyState(LinearLayout container, String message) {
@@ -384,12 +359,10 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (riwayatRef != null && historyListener != null) {
-            riwayatRef.removeEventListener(historyListener);
+        if (historyRef != null && historyListener != null) {
+            historyRef.removeEventListener(historyListener);
         }
-        if (riwayatRef != null && sensorHistoryListener != null) {
-            riwayatRef.removeEventListener(sensorHistoryListener);
-        }
+        // soilRef, waterRef, pumpRef listeners di-handle secara otomatis oleh Firebase SDK
     }
 
     private void applyStatusBarInsets() {
