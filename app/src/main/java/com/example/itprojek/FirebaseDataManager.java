@@ -1,166 +1,145 @@
 package com.example.itprojek;
 
+import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
+import com.google.firebase.database.*;
 import androidx.annotation.NonNull;
 
 /**
- * FirebaseDataManager
- * ─────────────────────────────────────────────────────────────────
- * Helper class untuk membaca dan menulis data sensor SORA
- * dari/ke Firebase Realtime Database.
- *
- * Struktur Database:
- * sora-app/
- * └── sensors/
- *     └── {deviceId}/
- *         ├── soilMoisture   : int  (0–100 %)
- *         ├── waterLevel     : int  (0–100 %)
- *         ├── pumpStatus     : boolean
- *         └── lastUpdated    : String (ISO-8601)
- *
- * Cara pakai:
- *   FirebaseDataManager dm = new FirebaseDataManager("ANG-123456");
- *   dm.listenSensorData(new FirebaseDataManager.SensorListener() { ... });
- *   dm.setPumpStatus(true);
+ * Membaca data real-time dari sensors/soil, sensors/water, sensors/pump
+ * Setiap field dibaca secara TERPISAH agar tidak perlu izin baca root sensors/
  */
 public class FirebaseDataManager {
 
-    // ── Callback interface ──────────────────────────────────────────
+    private static final String TAG    = "SORA-DB";
+    private static final String DB_URL =
+            "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
     public interface SensorListener {
         void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus);
         void onError(String errorMessage);
     }
 
-    // ── Konstanta path ──────────────────────────────────────────────
-    private static final String DB_URL =
-            "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    private final DatabaseReference soilRef;   // sensors/soil
+    private final DatabaseReference waterRef;  // sensors/water
+    private final DatabaseReference pumpRef;   // sensors/pump
+    private final DatabaseReference historyRef;
 
-    private static final String PATH_SENSORS = "sensors";
+    private ValueEventListener soilListener;
+    private ValueEventListener waterListener;
+    private ValueEventListener pumpListener;
 
-    // ── Fields ──────────────────────────────────────────────────────
-    private final DatabaseReference rootRef;
-    private final DatabaseReference sensorRef;
-    private final DatabaseReference pumpRef; // Direct reference for real-time pump relay
-    private ValueEventListener      activeListener;
-    private ValueEventListener      pumpListener;
+    private int     lastSoil  = 0;
+    private int     lastWater = 0;
+    private boolean lastPump  = false;
 
-    private int lastKnownSoil = 0;
-    private int lastKnownWater = 0;
-    private boolean lastKnownPump = false;
-
-    // ── Constructor ─────────────────────────────────────────────────
     public FirebaseDataManager(String deviceId) {
         FirebaseDatabase db = FirebaseDatabase.getInstance(DB_URL);
-        // Listen to the root to dynamically find the 'data_sensor' history table
-        rootRef = db.getReference();
-        // Specifically map to the device node
-        sensorRef = db.getReference(PATH_SENSORS).child(deviceId);
-        // Specific live node for two-way hardware pump toggle
-        pumpRef = sensorRef.child("pumpStatus");
+        DatabaseReference sensorsRef = db.getReference("sensors");
+        soilRef    = sensorsRef.child("soil");
+        waterRef   = sensorsRef.child("water");
+        pumpRef    = sensorsRef.child("pump");
+        historyRef = db.getReference("history").child(deviceId);
     }
 
-    // ── Mulai dengarkan perubahan data sensor secara real-time ───────
+    /** Real-time listener untuk ketiga field sekaligus */
     public void listenSensorData(SensorListener listener) {
-        
-        // 1. Listen for Historical Sensor Data (Soil/Water) from PHPMyAdmin array
-        activeListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                DataSnapshot dataSensorTable = null;
-                for (DataSnapshot tableNode : snapshot.getChildren()) {
-                    DataSnapshot nameNode = tableNode.child("name");
-                    if (nameNode.exists() && "data_sensor".equals(nameNode.getValue(String.class))) {
-                        dataSensorTable = tableNode.child("data");
-                        break;
-                    }
-                }
+        stopListening();
 
-                if (dataSensorTable != null && dataSensorTable.exists()) {
-                    DataSensor latestSensor = null;
-                    for (DataSnapshot ds : dataSensorTable.getChildren()) {
-                        DataSensor sensor = ds.getValue(DataSensor.class);
-                        // Using DEV001 to sync with the SQL dump records
-                        if (sensor != null && "DEV001".equals(sensor.id_perangkat)) {
-                            if (latestSensor == null || sensor.timestamp.compareTo(latestSensor.timestamp) > 0) {
-                                latestSensor = sensor;
-                            }
-                        }
-                    }
-
-                    if (latestSensor != null) {
-                        try { lastKnownSoil = Integer.parseInt(latestSensor.kelembapan_tanah); } catch(Exception ignored){}
-                        try { lastKnownWater = Integer.parseInt(latestSensor.level_air); } catch(Exception ignored){}
-                        listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
-                    }
-                }
+        soilListener = new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                lastSoil = toInt(s.getValue());
+                Log.d(TAG, "soil=" + lastSoil);
+                listener.onSensorUpdated(lastSoil, lastWater, lastPump);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                listener.onError(error.getMessage());
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                listener.onError("soil: " + e.getMessage());
             }
         };
-        rootRef.addValueEventListener(activeListener);
 
-        // 2. Listen for Real-Time Pump Status (Bi-directional)
-        pumpListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Boolean pump = snapshot.getValue(Boolean.class);
-                if (pump != null) {
-                    lastKnownPump = pump;
-                    listener.onSensorUpdated(lastKnownSoil, lastKnownWater, lastKnownPump);
-                }
+        waterListener = new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                lastWater = toInt(s.getValue());
+                Log.d(TAG, "water=" + lastWater);
+                listener.onSensorUpdated(lastSoil, lastWater, lastPump);
             }
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                listener.onError("water: " + e.getMessage());
+            }
+        };
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                listener.onError(error.getMessage());
+        soilRef.addValueEventListener(soilListener);
+        waterRef.addValueEventListener(waterListener);
+    }
+
+    /** Fetch sekali (polling) */
+    public void fetchSensorDataOnce(SensorListener listener) {
+        soilRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                lastSoil = toInt(s.getValue());
+                waterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override public void onDataChange(@NonNull DataSnapshot sw) {
+                        lastWater = toInt(sw.getValue());
+                        Log.d(TAG, "poll soil=" + lastSoil + " water=" + lastWater);
+                        listener.onSensorUpdated(lastSoil, lastWater, lastPump);
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError e) {
+                        listener.onError(e.getMessage());
+                    }
+                });
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                listener.onError(e.getMessage());
+            }
+        });
+    }
+
+    /** Real-time listener khusus pompa */
+    public void startPumpListener(SensorListener listener) {
+        if (pumpListener != null) pumpRef.removeEventListener(pumpListener);
+        pumpListener = new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot s) {
+                Object v = s.getValue();
+                if (v instanceof Boolean)  lastPump = (Boolean) v;
+                else if (v instanceof Long) lastPump = ((Long) v) != 0;
+                Log.d(TAG, "pump=" + lastPump);
+                listener.onSensorUpdated(lastSoil, lastWater, lastPump);
+            }
+            @Override public void onCancelled(@NonNull DatabaseError e) {
+                listener.onError(e.getMessage());
             }
         };
         pumpRef.addValueEventListener(pumpListener);
     }
 
-    // ── Berhenti mendengarkan (panggil di onDestroy / onPause) ───────
     public void stopListening() {
-        if (activeListener != null) {
-            rootRef.removeEventListener(activeListener);
-            activeListener = null;
-        }
-        if (pumpListener != null) {
-            pumpRef.removeEventListener(pumpListener);
-            pumpListener = null;
-        }
+        if (soilListener  != null) { soilRef.removeEventListener(soilListener);   soilListener  = null; }
+        if (waterListener != null) { waterRef.removeEventListener(waterListener); waterListener = null; }
+        if (pumpListener  != null) { pumpRef.removeEventListener(pumpListener);   pumpListener  = null; }
     }
 
-    // ── Tulis status pompa ke Firebase (dibaca oleh IoT device) ──────
     public void setPumpStatus(boolean isOn) {
         pumpRef.setValue(isOn);
-        lastKnownPump = isOn;
+        lastPump = isOn;
     }
 
-    // ── Tulis data sensor (dipakai oleh IoT device / simulator) ─────
-    public void updateSensorData(int soilMoisture, int waterLevel) {
-        sensorRef.child("soilMoisture").setValue(soilMoisture);
-        sensorRef.child("waterLevel").setValue(waterLevel);
-        sensorRef.child("lastUpdated")
-                 .setValue(new java.text.SimpleDateFormat(
-                         "yyyy-MM-dd'T'HH:mm:ss",
-                         java.util.Locale.getDefault())
-                         .format(new java.util.Date()));
+    public void updateSensorData(int soil, int water) {
+        soilRef.setValue(soil);
+        waterRef.setValue(water);
     }
 
-    // ── Ambil UID user yang sedang login ──────────────────────────────
+    public DatabaseReference getHistoryRef() { return historyRef; }
+
     public static String getCurrentUserId() {
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
             return FirebaseAuth.getInstance().getCurrentUser().getUid();
-        }
-        return "USR002"; // Fallback Test ID
+        return "USR002";
+    }
+
+    private int toInt(Object val) {
+        if (val instanceof Long)    return ((Long) val).intValue();
+        if (val instanceof Integer) return (Integer) val;
+        if (val instanceof String)  { try { return Integer.parseInt((String) val); } catch (Exception ignored) {} }
+        return 0;
     }
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
@@ -15,28 +14,27 @@
         android:layout_height="match_parent"
         android:background="@color/bg_app">
 
-        <!-- ================= HEADER ================= -->
-
+        <!-- Header - FIXED -->
         <View
             android:id="@+id/header_bg"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:background="#4CAF50"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/btn_menu"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
+            android:contentDescription="@string/app_name"
             android:padding="8dp"
             android:src="@drawable/ic_menu"
-            android:contentDescription="@string/app_name"
-            app:layout_constraintTop_toTopOf="@id/header_bg"
             app:layout_constraintBottom_toBottomOf="@id/header_bg"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/header_bg" />
 
         <TextView
             android:id="@+id/tv_title"
@@ -48,40 +46,89 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/header_bg"
             app:layout_constraintBottom_toBottomOf="@id/header_bg"
+            app:layout_constraintEnd_toStartOf="@id/btn_notification_top"
             app:layout_constraintStart_toEndOf="@id/btn_menu"
-            app:layout_constraintEnd_toStartOf="@id/btn_notification_top" />
+            app:layout_constraintTop_toTopOf="@id/header_bg" />
 
         <ImageView
             android:id="@+id/btn_notification_top"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
+            android:contentDescription="@string/notifikasi"
             android:padding="8dp"
             android:src="@drawable/ic_notification"
-            android:contentDescription="@string/notifikasi"
-            app:tint="@color/white"
-            app:layout_constraintTop_toTopOf="@id/header_bg"
             app:layout_constraintBottom_toBottomOf="@id/header_bg"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/header_bg"
+            app:tint="@color/white" />
 
-        <!-- ================= MONITORING ================= -->
+        <!-- 1. Emergency Stop - WRAP_CONTENT -->
+        <LinearLayout
+            android:id="@+id/emergency_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_emergency"
+            android:elevation="4dp"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/header_bg">
 
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="@string/emergency_stop"
+                android:src="@drawable/ic_emergency"
+                app:tint="@color/emergency_icon" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/emergency_stop"
+                    android:textColor="@color/emergency_icon"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_connected"
+                    android:textColor="@color/text_sub"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switch_emergency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                app:thumbTint="@color/white"
+                app:trackTint="@color/switch_track_emergency" />
+        </LinearLayout>
+
+        <!-- 2. Monitoring Container - FLEXIBLE (0dp) -->
         <LinearLayout
             android:id="@+id/monitoring_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
             android:layout_marginHorizontal="16dp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/header_bg"
-            app:layout_constraintBottom_toTopOf="@id/pump_control_card">
+            app:layout_constraintBottom_toTopOf="@id/pump_control_card"
+            app:layout_constraintTop_toBottomOf="@id/emergency_panel">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:letterSpacing="0.05"
                 android:text="@string/section_monitoring"
@@ -89,14 +136,13 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <!-- ================= CARD KELEMBAPAN ================= -->
-
+            <!-- Card 1: Soil Moisture -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_moisture"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginBottom="8dp"
                 android:layout_weight="1"
-                android:layout_marginBottom="10dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
@@ -118,8 +164,8 @@
                         android:textColor="@color/text_main"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/tv_moisture_value"
@@ -129,10 +175,10 @@
                         android:textColor="@color/text_main"
                         android:textSize="36sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/tv_moisture_title"
                         app:layout_constraintBottom_toTopOf="@id/layout_moisture_labels"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        app:layout_constraintTop_toBottomOf="@id/tv_moisture_title" />
 
                     <LinearLayout
                         android:id="@+id/layout_moisture_labels"
@@ -177,21 +223,17 @@
                             android:textColor="@color/water_blue"
                             android:textSize="12sp"
                             android:alpha="0.5" />
-
                     </LinearLayout>
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ================= CARD LEVEL AIR ================= -->
-
+            <!-- Card 2: Water Level -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_water"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginBottom="8dp"
                 android:layout_weight="1"
-                android:layout_marginBottom="10dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
@@ -213,16 +255,16 @@
                         android:textColor="@color/text_main"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <RelativeLayout
                         android:id="@+id/layout_tank"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_marginTop="8dp"
-                        app:layout_constraintTop_toBottomOf="@id/tv_water_title"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_water_title">
 
                         <View
                             android:id="@+id/tank_outline"
@@ -248,28 +290,22 @@
                             android:textColor="@color/white"
                             android:textSize="20sp"
                             android:textStyle="bold" />
-
                     </RelativeLayout>
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
 
-        <!-- ================= KONTROL POMPA ================= -->
-
+        <!-- 3. Kontrol Pompa - WRAP_CONTENT -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/pump_control_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="12dp"
+            android:layout_margin="16dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
+            app:layout_constraintBottom_toTopOf="@id/bottom_nav"
             app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_nav">
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -314,7 +350,6 @@
                             android:text="@string/off"
                             android:textColor="#EF5350"
                             android:textSize="13sp" />
-
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -322,15 +357,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="false" />
-
                 </LinearLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ================= BOTTOM NAVIGATION ================= -->
-
+        <!-- Bottom Navigation - FIXED -->
         <LinearLayout
             android:id="@+id/bottom_nav"
             android:layout_width="0dp"
@@ -339,25 +370,23 @@
             android:elevation="12dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <!-- HOME -->
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
                 android:id="@+id/nav_home"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:foreground="?android:attr/selectableItemBackground">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_home"
                     android:contentDescription="@string/beranda"
+                    android:src="@drawable/ic_home"
                     app:tint="@color/nav_active" />
 
                 <TextView
@@ -368,25 +397,22 @@
                     android:textColor="@color/nav_active"
                     android:textSize="11sp"
                     android:textStyle="bold" />
-
             </LinearLayout>
-
-            <!-- HISTORY -->
 
             <LinearLayout
                 android:id="@+id/nav_history"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:foreground="?android:attr/selectableItemBackground">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_history"
                     android:contentDescription="@string/riwayat"
+                    android:src="@drawable/ic_history"
                     app:tint="@color/nav_inactive" />
 
                 <TextView
@@ -396,25 +422,22 @@
                     android:text="@string/riwayat"
                     android:textColor="@color/nav_inactive"
                     android:textSize="11sp" />
-
             </LinearLayout>
-
-            <!-- NOTIFIKASI -->
 
             <LinearLayout
                 android:id="@+id/nav_notifications"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:foreground="?android:attr/selectableItemBackground">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_notification"
                     android:contentDescription="@string/notifikasi"
+                    android:src="@drawable/ic_notification"
                     app:tint="@color/nav_inactive" />
 
                 <TextView
@@ -424,25 +447,22 @@
                     android:text="@string/notifikasi"
                     android:textColor="@color/nav_inactive"
                     android:textSize="11sp" />
-
             </LinearLayout>
-
-            <!-- SETTINGS -->
 
             <LinearLayout
                 android:id="@+id/nav_settings"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:foreground="?android:attr/selectableItemBackground">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_settings"
                     android:contentDescription="@string/pengaturan"
+                    android:src="@drawable/ic_settings"
                     app:tint="@color/nav_inactive" />
 
                 <TextView
@@ -452,14 +472,10 @@
                     android:text="@string/pengaturan"
                     android:textColor="@color/nav_inactive"
                     android:textSize="11sp" />
-
             </LinearLayout>
-
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- ================= DRAWER MENU ================= -->
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

@@ -70,7 +70,7 @@ public class DetailActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> {
             finish();
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
         // ── Firebase Realtime Data ──

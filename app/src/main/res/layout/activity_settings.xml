@@ -83,42 +83,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Item 1: Jadwal (Fitts's Law: 56dp height, icon for recognition) -->
-                    <LinearLayout
-                        android:id="@+id/item_schedule"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_history"
-                            app:tint="@color/nav_active"
-                            android:contentDescription="@string/schedule_settings" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/schedule_settings"
-                            android:textColor="@color/text_main"
-                            android:textSize="15sp" />
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_back"
-                            android:rotation="180"
-                            app:tint="@color/text_sub"
-                            android:contentDescription="@string/schedule_settings" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="56dp" />
-
                     <!-- Item 2: Kalibrasi -->
                     <LinearLayout
                         android:id="@+id/item_calibration"
@@ -310,6 +274,7 @@
                 android:layout_marginBottom="20dp">
 
                 <LinearLayout
+                    android:id="@+id/item_about"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
