@@ -251,39 +251,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // === Emergency Stop Section ===
-        switchEmergency = findViewById(R.id.switch_emergency);
-        switchEmergency.setTrackTintList(ContextCompat.getColorStateList(this, R.color.switch_track_emergency));
-        
-        switchEmergency.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isEmergencyUpdating) return;
-
-            String message = isChecked ? "Yakin ingin mengaktifkan Emergency Stop?" : "Yakin ingin mematikan Emergency Stop?";
-
-            new AlertDialog.Builder(this)
-                    .setTitle("Konfirmasi")
-                    .setMessage(message)
-                    .setPositiveButton("LANJUTKAN", (dialog, which) -> {
-                        // Jalankan logic emergency
-                        if (isChecked) {
-                            isPumpUpdating = true;
-                            switchPump.setChecked(false);
-                            isPumpUpdating = false;
-                            dataManager.setPumpStatus(false);
-                        }
-                        dialog.dismiss();
-                    })
-                    .setNegativeButton("BATAL", (dialog, which) -> {
-                        // Kembalikan ke state sebelumnya tanpa memicu listener lagi
-                        isEmergencyUpdating = true;
-                        switchEmergency.setChecked(!isChecked);
-                        isEmergencyUpdating = false;
-                        dialog.dismiss();
-                    })
-                    .setCancelable(false)
-                    .show();
-        });
-
         // Bottom Navigation
         LinearLayout navHistory       = findViewById(R.id.nav_history);
         LinearLayout navNotifications = findViewById(R.id.nav_notifications);
