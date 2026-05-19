@@ -50,7 +50,7 @@
     <!-- Pengaturan -->
     <string name="system_settings">Pengaturan Sistem</string>
     <string name="schedule_settings">Pengaturan Jadwal Penyiraman</string>
-    <string name="sensor_calibration">Kalibrasi Sensor</string>
+    <string name="sensor_calibration">Penyetelan Ulang Sensor</string>
     <string name="notif_alert_settings">Notifikasi &amp; Peringatan</string>
     <string name="device_info">Informasi Perangkat</string>
     <string name="device_name_label">Nama Perangkat</string>
@@ -82,14 +82,14 @@
     <string name="max_30">30</string>
 
     <!-- Kalibrasi Sensor -->
-    <string name="calib_desc">Kalibrasi sensor soil moisture untuk mengatur kondisi kelembapan tanah pada rentang nilai berikut:</string>
+    <string name="calib_desc">Penyetelan ulang sensor kelembapan tanah untuk mengatur kondisi pada rentang nilai berikut:</string>
     <string name="calib_kering_range">5      2: 10      30</string>
     <string name="calib_normal_range">31 - 50%      60%</string>
     <string name="sensor_soil">Sensor Kelembapan Tanah</string>
     <string name="sensor_water">Sensor Level Air</string>
     <string name="air_rendah">Air Rendah</string>
     <string name="air_normal">Air Normal</string>
-    <string name="simpan_kalibrasi">Simpan Kalibrasi</string>
+    <string name="simpan_kalibrasi">Simpan Penyetelan</string>
     <string name="persen_20">20%</string>
     <string name="persen_30">30%</string>
     <string name="persen_50">50%</string>

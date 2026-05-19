@@ -37,7 +37,19 @@ public class DetailActivity extends AppCompatActivity {
     private TextView    tvConnectionStatus, tvLastUpdated;
     private TextView    tvMoistureDetail, tvSoilStatus;
     private TextView    tvWaterDetail, tvWaterStatus;
-    private ProgressBar pbMoisture, pbWater;
+    private TextView    tvWaterUsageLiter, tvWaterUsageStatus, tvWaterUsageMax, tvPumpDuration;
+    private ProgressBar pbMoisture, pbWater, pbWaterUsage;
+
+    // ── Tracking penggunaan air ──
+    // Asumsi: pompa mengalirkan 0.5 liter per menit
+    private static final float LITER_PER_MENIT = 0.5f;
+    // Batas wajar penggunaan air per hari = 10 liter
+    private static final float MAX_LITER_PERHARI = 10f;
+
+    private boolean lastPumpOn       = false;
+    private long    pumpOnTimestamp  = 0L;  // waktu pompa terakhir ON
+    private float   totalLiterToday  = 0f;  // total liter terpakai hari ini
+    private int     totalMinutesToday= 0;   // total menit pompa menyala
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +69,23 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         // ── Bind Views ──
-        tvConnectionStatus = findViewById(R.id.tv_connection_status);
-        tvLastUpdated      = findViewById(R.id.tv_last_updated);
-        tvMoistureDetail   = findViewById(R.id.tv_moisture_detail);
-        tvSoilStatus       = findViewById(R.id.tv_soil_status);
-        tvWaterDetail      = findViewById(R.id.tv_water_detail);
-        tvWaterStatus      = findViewById(R.id.tv_water_status);
-        pbMoisture         = findViewById(R.id.pb_moisture);
-        pbWater            = findViewById(R.id.pb_water);
+        tvConnectionStatus  = findViewById(R.id.tv_connection_status);
+        tvLastUpdated       = findViewById(R.id.tv_last_updated);
+        tvMoistureDetail    = findViewById(R.id.tv_moisture_detail);
+        tvSoilStatus        = findViewById(R.id.tv_soil_status);
+        tvWaterDetail       = findViewById(R.id.tv_water_detail);
+        tvWaterStatus       = findViewById(R.id.tv_water_status);
+        pbMoisture          = findViewById(R.id.pb_moisture);
+        pbWater             = findViewById(R.id.pb_water);
+        tvWaterUsageLiter   = findViewById(R.id.tv_water_usage_liter);
+        tvWaterUsageStatus  = findViewById(R.id.tv_water_usage_status);
+        tvWaterUsageMax     = findViewById(R.id.tv_water_usage_max);
+        tvPumpDuration      = findViewById(R.id.tv_pump_duration);
+        pbWaterUsage        = findViewById(R.id.pb_water_usage);
+
+        // Set label batas maksimum
+        if (tvWaterUsageMax != null)
+            tvWaterUsageMax.setText(String.format(Locale.getDefault(), "%.0fL", MAX_LITER_PERHARI));
 
         // ── Tombol back ──
         ImageView btnBack = findViewById(R.id.btn_back);
@@ -81,6 +102,7 @@ public class DetailActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     updateSoilMoisture(soilMoisture);
                     updateWaterLevel(waterLevel);
+                    updateWaterUsage(pumpStatus);
                     updateTimestamp();
                     setConnectionOnline();
                 });
@@ -182,6 +204,69 @@ public class DetailActivity extends AppCompatActivity {
         tvConnectionStatus.setText("Offline");
         tvConnectionStatus.setTextColor(Color.parseColor("#EF5350"));
         android.util.Log.w("SORA-Detail", "Firebase error: " + reason);
+    }
+
+    // ─────────────────────────────────────────────
+    //  Hitung & update Penggunaan Air Hari Ini
+    // ─────────────────────────────────────────────
+    private void updateWaterUsage(boolean pumpOn) {
+        long now = System.currentTimeMillis();
+
+        if (pumpOn && !lastPumpOn) {
+            // Pompa baru menyala → catat waktu mulai
+            pumpOnTimestamp = now;
+        } else if (!pumpOn && lastPumpOn && pumpOnTimestamp > 0) {
+            // Pompa baru mati → hitung durasi sesi ini
+            long durasiMs  = now - pumpOnTimestamp;
+            float durasiMenit = durasiMs / 60000f;
+            totalMinutesToday += (int) Math.ceil(durasiMenit);
+            totalLiterToday   += durasiMenit * LITER_PER_MENIT;
+            pumpOnTimestamp = 0L;
+        }
+        lastPumpOn = pumpOn;
+
+        // Tambahkan estimasi sesi yang sedang berjalan (jika pompa masih ON)
+        float displayLiter = totalLiterToday;
+        int   displayMenit = totalMinutesToday;
+        if (pumpOn && pumpOnTimestamp > 0) {
+            float durasiMenitBerjalan = (now - pumpOnTimestamp) / 60000f;
+            displayLiter += durasiMenitBerjalan * LITER_PER_MENIT;
+            displayMenit += (int) Math.ceil(durasiMenitBerjalan);
+        }
+
+        // Persentase dari batas maksimum harian
+        int persen = (int) Math.min((displayLiter / MAX_LITER_PERHARI) * 100f, 100f);
+
+        // Update tampilan
+        if (tvWaterUsageLiter != null)
+            tvWaterUsageLiter.setText(String.format(Locale.getDefault(), "%.1f", displayLiter));
+        if (pbWaterUsage != null)
+            pbWaterUsage.setProgress(persen);
+        if (tvPumpDuration != null)
+            tvPumpDuration.setText("Pompa menyala: " + displayMenit + " menit hari ini");
+
+        // Status: Hemat / Normal / Boros
+        if (tvWaterUsageStatus != null) {
+            if (persen < 40) {
+                tvWaterUsageStatus.setText("Hemat");
+                tvWaterUsageStatus.setTextColor(android.graphics.Color.parseColor("#43A047"));
+                if (pbWaterUsage != null)
+                    pbWaterUsage.setProgressTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#43A047")));
+            } else if (persen < 80) {
+                tvWaterUsageStatus.setText("Normal");
+                tvWaterUsageStatus.setTextColor(android.graphics.Color.parseColor("#FF8F00"));
+                if (pbWaterUsage != null)
+                    pbWaterUsage.setProgressTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFB74D")));
+            } else {
+                tvWaterUsageStatus.setText("Boros");
+                tvWaterUsageStatus.setTextColor(android.graphics.Color.parseColor("#E53935"));
+                if (pbWaterUsage != null)
+                    pbWaterUsage.setProgressTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#EF5350")));
+            }
+        }
     }
 
     @Override

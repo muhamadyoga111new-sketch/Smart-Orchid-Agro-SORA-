@@ -42,19 +42,14 @@ public class MainActivity extends AppCompatActivity {
     private int                 lastSoilMoisture = 0;
     private MaterialSwitch      switchPump;
     private TextView            tvPumpStatus;
-    private MaterialSwitch      switchEmergency;
     private MaterialSwitch      switchAutoMode;
     private TextView            tvAutoThreshold;
-    private boolean             isEmergencyUpdating = false;
     private boolean             isPumpUpdating = false;
     private boolean             isAutoMode = false;
     private boolean             isAutoUpdating = false;
 
-    // ── Periodic Sensor Polling ──────────────────────────────────────
-    private Handler  sensorHandler;
-    private Runnable sensorPollRunnable;
-    /** Interval pengambilan data sensor: 1 menit = 1 × 60 × 1000 ms */
-    private static final long SENSOR_INTERVAL_MS = 1 * 60 * 1000L;
+    // ── Firebase real-time listener (menggantikan polling 1 menit) ──
+    // tidak ada lagi Handler/Runnable — Firebase langsung push setiap ada perubahan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,55 +271,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // Polling sensor (soil & water) setiap 1 menit
-        sensorHandler = new Handler(Looper.getMainLooper());
-        sensorPollRunnable = new Runnable() {
-            @Override
-            public void run() {
-                android.util.Log.d("SORA-POLL", "Mengambil data sensor...");
-                dataManager.fetchSensorDataOnce(sensorCallback);
-                // Jadwalkan polling berikutnya
-                sensorHandler.postDelayed(this, SENSOR_INTERVAL_MS);
-            }
-        };
-        // Fetch segera saat app dibuka, lalu tiap 1 menit
-        sensorHandler.post(sensorPollRunnable);
+        // === Sensor real-time (soil & water) ===
+        // listenSensorData akan langsung fire saat data berubah di Firebase
+        dataManager.listenSensorData(sensorCallback);
 
         // Pump status tetap real-time (sinkron dua arah dengan hardware)
         dataManager.startPumpListener(sensorCallback);
 
-        // === Emergency Stop Section ===
-        switchEmergency = findViewById(R.id.switch_emergency);
-        switchEmergency.setTrackTintList(ContextCompat.getColorStateList(this, R.color.switch_track_emergency));
-        
-        switchEmergency.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isEmergencyUpdating) return;
 
-            String message = isChecked ? "Yakin ingin mengaktifkan Emergency Stop?" : "Yakin ingin mematikan Emergency Stop?";
-
-            new AlertDialog.Builder(this)
-                    .setTitle("Konfirmasi")
-                    .setMessage(message)
-                    .setPositiveButton("LANJUTKAN", (dialog, which) -> {
-                        // Jalankan logic emergency
-                        if (isChecked) {
-                            isPumpUpdating = true;
-                            switchPump.setChecked(false);
-                            isPumpUpdating = false;
-                            dataManager.setPumpStatus(false);
-                        }
-                        dialog.dismiss();
-                    })
-                    .setNegativeButton("BATAL", (dialog, which) -> {
-                        // Kembalikan ke state sebelumnya tanpa memicu listener lagi
-                        isEmergencyUpdating = true;
-                        switchEmergency.setChecked(!isChecked);
-                        isEmergencyUpdating = false;
-                        dialog.dismiss();
-                    })
-                    .setCancelable(false)
-                    .show();
-        });
 
         // Bottom Navigation
         LinearLayout navHistory       = findViewById(R.id.nav_history);
@@ -352,11 +306,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Hentikan periodic polling sensor
-        if (sensorHandler != null && sensorPollRunnable != null) {
-            sensorHandler.removeCallbacks(sensorPollRunnable);
-        }
-        // Hentikan Firebase listeners (pump real-time)
+        // Hentikan semua Firebase listeners (soil, water, pump real-time)
         if (dataManager != null) dataManager.stopListening();
     }
 
@@ -450,8 +400,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkAutoWatering(int soilMoisture) {
         if (!isAutoMode) return;
 
-        // Jika Emergency Stop aktif, jangan nyalakan pompa otomatis
-        if (switchEmergency != null && switchEmergency.isChecked()) return;
+
 
         int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
         int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
