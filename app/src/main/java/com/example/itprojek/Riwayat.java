@@ -7,8 +7,6 @@ public class Riwayat implements Comparable<Riwayat> {
     public String id_riwayat;
     public String kelembapan_sebelum;
     public String kelembapan_sesudah;
-    public String level_air_sebelum;
-    public String level_air_sesudah;
     public String tanggal; // Format: yyyy-MM-dd
     public String trigger_type;
     public String waktu_mulai; // Format: HH:mm:ss
@@ -24,8 +22,6 @@ public class Riwayat implements Comparable<Riwayat> {
     public String getId_riwayat() { return id_riwayat; }
     public String getKelembapan_sebelum() { return kelembapan_sebelum; }
     public String getKelembapan_sesudah() { return kelembapan_sesudah; }
-    public String getLevel_air_sebelum() { return level_air_sebelum; }
-    public String getLevel_air_sesudah() { return level_air_sesudah; }
     public String getTanggal() { return tanggal; }
     public String getTrigger_type() { return trigger_type; }
     public String getWaktu_mulai() { return waktu_mulai; }
