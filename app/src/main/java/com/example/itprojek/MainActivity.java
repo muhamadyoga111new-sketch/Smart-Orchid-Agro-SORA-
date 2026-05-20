@@ -1,5 +1,8 @@
 package com.example.itprojek;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -15,6 +18,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
 
         // === Firebase Realtime Database ===
         dataManager = new FirebaseDataManager(DEVICE_ID);
+
+        // === Minta izin notifikasi (Android 13+) ===
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 100);
+            }
+        }
 
         // === Navigation Drawer Setup ===
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -243,6 +260,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
                 lastSoilMoisture = soilMoisture;
                 updateSensorUI(soilMoisture, waterLevel);
+                // Cek kondisi sensor dan kirim notifikasi lokal jika diperlukan
+                checkAndNotify(soilMoisture, waterLevel);
 
                 if (isAutoMode) {
                     checkAutoWatering(soilMoisture);
@@ -383,6 +402,136 @@ public class MainActivity extends AppCompatActivity {
                 tankOutline.post(updateHeight);
             }
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Notifikasi Lokal — dicek setiap kali sensor data masuk
+    // ─────────────────────────────────────────────────────────────────
+    private static final String CHANNEL_ID    = "sora_alerts";
+    private static final String CHANNEL_NAME  = "SORA Peringatan";
+    // Cooldown agar notifikasi tidak spam (5 menit per tipe)
+    private long lastNotifTimeTank  = 0;
+    private long lastNotifTimeDry   = 0;
+    private long lastNotifTimeMoist = 0;
+    private static final long NOTIF_COOLDOWN_MS = 5 * 60 * 1000; // 5 menit
+
+    /**
+     * Periksa kondisi sensor dan kirim notifikasi lokal sesuai toggle pengaturan.
+     * Dipanggil setiap kali data sensor diperbarui dari Firebase.
+     */
+    private void checkAndNotify(int soilMoisture, int waterLevel) {
+        long now = System.currentTimeMillis();
+        int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
+        int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
+
+        // --- Air Tangki Habis ---
+        if (pref.getBoolean("NOTIF_TANK", true) && waterLevel <= 0) {
+            if (now - lastNotifTimeTank > NOTIF_COOLDOWN_MS) {
+                lastNotifTimeTank = now;
+                sendLocalNotification(
+                        getString(R.string.alert_tank_title),
+                        "Air tangki habis! Segera isi ulang tangki air.",
+                        "Air Tangki Habis", 1001);
+            }
+        }
+
+        // --- Proteksi Pompa (alarm jika tangki habis & pompa ON) ---
+        if (pref.getBoolean("NOTIF_TANK_ALARM", true) && waterLevel <= 0 && switchPump.isChecked()) {
+            if (now - lastNotifTimeTank > NOTIF_COOLDOWN_MS) {
+                lastNotifTimeTank = now;
+                sendLocalNotification(
+                        getString(R.string.alert_tank_alarm_title),
+                        "Pompa menyala saat tangki kosong! Pompa dimatikan otomatis.",
+                        "Proteksi Pompa Air", 1002);
+                // Matikan pompa otomatis untuk proteksi
+                isPumpUpdating = true;
+                switchPump.setChecked(false);
+                isPumpUpdating = false;
+                pref.saveBoolean("STATUS_POMPA", false);
+                updatePumpStatusUI(tvPumpStatus, false);
+                dataManager.setPumpStatus(false);
+            }
+        }
+
+        // --- Tanah Kering ---
+        if (pref.getBoolean("NOTIF_DRY", true) && soilMoisture < thresholdKering) {
+            if (now - lastNotifTimeDry > NOTIF_COOLDOWN_MS) {
+                lastNotifTimeDry = now;
+                sendLocalNotification(
+                        getString(R.string.alert_dry_title),
+                        "Kelembapan tanah sangat rendah (" + soilMoisture + "%)! Segera lakukan penyiraman.",
+                        "Tanah Kering", 1003);
+            }
+        }
+
+        // --- Tanah Lembab (kembali normal) ---
+        if (pref.getBoolean("NOTIF_MOIST", false) && soilMoisture >= thresholdNormal) {
+            if (now - lastNotifTimeMoist > NOTIF_COOLDOWN_MS) {
+                lastNotifTimeMoist = now;
+                sendLocalNotification(
+                        getString(R.string.alert_moist_title),
+                        "Tanah sudah kembali lembab (" + soilMoisture + "%). Penyiraman dapat dihentikan.",
+                        "Tanah Lembab", 1004);
+            }
+        }
+    }
+
+    /** Kirim notifikasi sistem Android lokal + simpan ke SharedPreferences */
+    private void sendLocalNotification(String title, String body, String tipeAlert, int notifId) {
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (nm == null) return;
+
+        // Buat channel (diperlukan Android 8+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Peringatan sistem penyiraman SORA");
+            nm.createNotificationChannel(channel);
+        }
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pi = PendingIntent.getActivity(
+                this, notifId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(title)
+                        .setContentText(body)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                        .setAutoCancel(true)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setContentIntent(pi);
+
+        nm.notify(notifId, builder.build());
+        android.util.Log.d("SORA-NOTIF", "Notifikasi dikirim: " + title);
+
+        // Simpan ke SharedPreferences lokal
+        saveNotificationLocally(title, body, tipeAlert);
+    }
+
+    /** Simpan notifikasi ke SharedPreferences lokal (andal, tidak perlu Firebase rules) */
+    private void saveNotificationLocally(String title, String body, String tipeAlert) {
+        String timestamp = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                java.util.Locale.getDefault()).format(new java.util.Date());
+
+        // Format: "timestamp|tipe_alert|judul|pesan"
+        String entry = timestamp + "|" + tipeAlert + "|" + title + "|" + body;
+
+        // Baca daftar yang sudah ada (pakai copy untuk hindari bug SharedPreferences)
+        java.util.Set<String> existing = pref.getStringSet("LOCAL_NOTIFICATIONS");
+        java.util.LinkedHashSet<String> updated = new java.util.LinkedHashSet<>(existing);
+        updated.add(entry);
+
+        // Batasi maksimum 50 notifikasi
+        while (updated.size() > 50) {
+            updated.remove(updated.iterator().next());
+        }
+
+        pref.saveStringSet("LOCAL_NOTIFICATIONS", updated);
+        android.util.Log.d("SORA-NOTIF", "Notif disimpan lokal: " + title + " (total: " + updated.size() + ")");
     }
 
 

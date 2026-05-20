@@ -67,63 +67,66 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private void fetchNotifications() {
         LinearLayout container = findViewById(R.id.container_notifications);
-        com.google.firebase.database.FirebaseDatabase db = com.google.firebase.database.FirebaseDatabase.getInstance("https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        db.getReference().addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                com.google.firebase.database.DataSnapshot notifTable = null;
-                for (com.google.firebase.database.DataSnapshot tableNode : snapshot.getChildren()) {
-                    com.google.firebase.database.DataSnapshot nameNode = tableNode.child("name");
-                    if (nameNode.exists() && "notifikasi".equals(nameNode.getValue(String.class))) {
-                        notifTable = tableNode.child("data");
-                        break;
-                    }
-                }
+        TextView tvEmpty = findViewById(R.id.tv_empty_notif);
 
-                if (notifTable != null && notifTable.exists()) {
-                    java.util.List<Notifikasi> dataList = new java.util.ArrayList<>();
-                    for (com.google.firebase.database.DataSnapshot ds : notifTable.getChildren()) {
-                        Notifikasi notif = ds.getValue(Notifikasi.class);
-                        if (notif != null && "USR002".equals(notif.id_pengguna)) {
-                            dataList.add(notif);
-                        }
-                    }
+        PrefManager pref = new PrefManager(this);
+        java.util.Set<String> rawSet = pref.getStringSet("LOCAL_NOTIFICATIONS");
 
-                    java.util.Collections.sort(dataList);
+        // Buat list & urutkan terbaru di atas (format: timestamp|tipe|judul|pesan)
+        java.util.List<String> entries = new java.util.ArrayList<>(rawSet);
+        java.util.Collections.sort(entries, java.util.Collections.reverseOrder());
 
-                    container.removeAllViews();
-                    for (Notifikasi n : dataList) {
-                        View card = getLayoutInflater().inflate(R.layout.item_notifikasi, container, false);
+        container.removeAllViews();
 
-                        TextView tvTitle = card.findViewById(R.id.tv_notif_title);
-                        TextView tvTime = card.findViewById(R.id.tv_notif_time);
-                        TextView tvMessage = card.findViewById(R.id.tv_notif_message);
-                        ImageView ivIcon = card.findViewById(R.id.iv_notif_icon);
+        if (entries.isEmpty()) {
+            if (tvEmpty != null) tvEmpty.setVisibility(View.VISIBLE);
+            return;
+        }
+        if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
 
-                        tvTitle.setText(n.judul != null ? n.judul : "Notifikasi");
-                        tvTime.setText(n.timestamp != null ? n.timestamp : "");
-                        tvMessage.setText(n.pesan != null ? n.pesan : "");
+        for (String entry : entries) {
+            String[] parts = entry.split("\\|", 4);
+            if (parts.length < 4) continue;
 
-                        // Dynamic icon/colors based on type
-                        if ("Tanah Kering".equals(n.tipe_alert) || "Tangki Rendah".equals(n.tipe_alert)) {
-                            ivIcon.setImageResource(R.drawable.ic_warning);
-                            ivIcon.setColorFilter(android.graphics.Color.parseColor("#EF5350"));
-                        } else if ("Kelembapan Tinggi".equals(n.tipe_alert)) {
-                            ivIcon.setImageResource(R.drawable.ic_info);
-                            ivIcon.setColorFilter(android.graphics.Color.parseColor("#29B6F6"));
-                        } else {
-                            ivIcon.setImageResource(R.drawable.ic_notification);
-                        }
+            String timestamp = parts[0];
+            String tipeAlert = parts[1];
+            String judul     = parts[2];
+            String pesan     = parts[3];
 
-                        container.addView(card);
-                    }
-                }
+            View card = getLayoutInflater().inflate(R.layout.item_notifikasi, container, false);
+
+            TextView tvTitle   = card.findViewById(R.id.tv_notif_title);
+            TextView tvTime    = card.findViewById(R.id.tv_notif_time);
+            TextView tvMessage = card.findViewById(R.id.tv_notif_message);
+            ImageView ivIcon   = card.findViewById(R.id.iv_notif_icon);
+
+            tvTitle.setText(judul);
+            tvTime.setText(timestamp);
+            tvMessage.setText(pesan);
+
+            // Ikon & warna berdasarkan tipe_alert
+            switch (tipeAlert) {
+                case "Air Tangki Habis":
+                case "Proteksi Pompa Air":
+                    ivIcon.setImageResource(R.drawable.ic_warning);
+                    ivIcon.setColorFilter(android.graphics.Color.parseColor("#EF5350"));
+                    break;
+                case "Tanah Kering":
+                    ivIcon.setImageResource(R.drawable.ic_warning);
+                    ivIcon.setColorFilter(android.graphics.Color.parseColor("#FF8F00"));
+                    break;
+                case "Tanah Lembab":
+                    ivIcon.setImageResource(R.drawable.ic_info);
+                    ivIcon.setColorFilter(android.graphics.Color.parseColor("#29B6F6"));
+                    break;
+                default:
+                    ivIcon.setImageResource(R.drawable.ic_notification);
+                    ivIcon.clearColorFilter();
+                    break;
             }
 
-            @Override
-            public void onCancelled(com.google.firebase.database.DatabaseError error) {
-            }
-        });
+            container.addView(card);
+        }
     }
 
     private void applyStatusBarInsets() {

@@ -83,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Item 2: Kalibrasi -->
+                    <!-- Item 1: Kalibrasi -->
                     <LinearLayout
                         android:id="@+id/item_calibration"
                         android:layout_width="match_parent"

@@ -204,7 +204,7 @@ public class FirebaseDataManager {
     public static String getCurrentUserId() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null)
             return FirebaseAuth.getInstance().getCurrentUser().getUid();
-        return "USR002";
+        return null; // jangan fallback ke hardcoded ID
     }
 
     // ── Helper ───────────────────────────────────────────────────────

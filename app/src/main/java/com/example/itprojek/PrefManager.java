@@ -70,4 +70,14 @@ public class PrefManager {
     public void remove(String key) {
         pref.edit().remove(key).apply();
     }
+
+    // ==================== StringSet (untuk notifikasi lokal) ====================
+
+    public void saveStringSet(String key, java.util.Set<String> value) {
+        pref.edit().putStringSet(key, value).apply();
+    }
+
+    public java.util.Set<String> getStringSet(String key) {
+        return pref.getStringSet(key, new java.util.LinkedHashSet<>());
+    }
 }

@@ -32,19 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Settings menu items — push navigation (slide like Instagram detail)
-        LinearLayout itemSchedule = findViewById(R.id.item_schedule);
+        // Settings menu items
         LinearLayout itemCalibration = findViewById(R.id.item_calibration);
         LinearLayout itemNotifAlert = findViewById(R.id.item_notif_alert);
 
-        applyScaleAnimation(itemSchedule);
         applyScaleAnimation(itemCalibration);
         applyScaleAnimation(itemNotifAlert);
-
-        itemSchedule.setOnClickListener(v -> {
-            startActivity(new Intent(this, ScheduleActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        });
 
         itemCalibration.setOnClickListener(v -> {
             startActivity(new Intent(this, CalibrationActivity.class));
