@@ -83,43 +83,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Item 1: Kalibrasi -->
-                    <LinearLayout
-                        android:id="@+id/item_calibration"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_settings"
-                            app:tint="@color/nav_active"
-                            android:contentDescription="@string/sensor_calibration" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:text="@string/sensor_calibration"
-                            android:textColor="@color/text_main"
-                            android:textSize="15sp" />
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_back"
-                            android:rotation="180"
-                            app:tint="@color/text_sub"
-                            android:contentDescription="@string/sensor_calibration" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="56dp" />
-
-                    <!-- Item 3: Notifikasi -->
+                    <!-- Item: Notifikasi -->
                     <LinearLayout
                         android:id="@+id/item_notif_alert"
                         android:layout_width="match_parent"

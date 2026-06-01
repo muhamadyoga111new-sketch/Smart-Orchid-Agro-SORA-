@@ -16,4 +16,10 @@
     </style>
 
     <style name="Theme.ITPROJEK" parent="Base.Theme.ITPROJEK" />
+
+    <!-- Style untuk teks item menu sidebar (lebih kecil) -->
+    <style name="NavMenuText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

@@ -86,10 +86,31 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Subscribe ke topik FCM agar mendapat push notification dari ESP32 walau aplikasi ditutup
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("sora_alerts")
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    android.util.Log.e("SORA-FCM", "Gagal subscribe ke topik sora_alerts");
+                } else {
+                    android.util.Log.d("SORA-FCM", "Berhasil subscribe ke topik sora_alerts");
+                }
+            });
+
         // === Navigation Drawer Setup ===
         drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.setScrimColor(android.graphics.Color.TRANSPARENT); // tanpa overlay gelap
         NavigationView navView = findViewById(R.id.nav_view);
-        navView.setCheckedItem(R.id.drawer_home);
+
+        // Muat foto & nama pengguna ke header drawer
+        loadDrawerHeader(navView);
+
+        // Refresh header setiap kali drawer dibuka
+        drawerLayout.addDrawerListener(new androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                loadDrawerHeader(navView);
+            }
+        });
 
         // Handle Back Press with OnBackPressedDispatcher
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -112,18 +133,7 @@ public class MainActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             drawerLayout.closeDrawer(GravityCompat.START);
-            if (id == R.id.drawer_home) {
-                // Already on home
-            } else if (id == R.id.drawer_history) {
-                startActivity(new Intent(this, HistoryActivity.class));
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-            } else if (id == R.id.drawer_notifications) {
-                startActivity(new Intent(this, NotificationsActivity.class));
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-            } else if (id == R.id.drawer_settings) {
-                startActivity(new Intent(this, SettingsActivity.class));
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-            } else if (id == R.id.drawer_profile) {
+            if (id == R.id.drawer_profile) {
                 startActivity(new Intent(this, ProfileActivity.class));
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             } else if (id == R.id.drawer_detail) {
@@ -329,8 +339,54 @@ public class MainActivity extends AppCompatActivity {
         if (dataManager != null) dataManager.stopListening();
     }
 
+    /** Muat foto & nama pengguna ke header Navigation Drawer */
+    private void loadDrawerHeader(com.google.android.material.navigation.NavigationView navView) {
+        View headerView = navView.getHeaderView(0);
+        if (headerView == null) return;
+
+        // ── Sesuaikan paddingTop dengan tinggi status bar aktual ─
+        int statusBarHeight = 0;
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) statusBarHeight = getResources().getDimensionPixelSize(resId);
+        int padPx = (int) (12 * getResources().getDisplayMetrics().density);
+        headerView.setPadding(padPx, statusBarHeight + padPx, padPx, padPx);
+
+        ImageView ivPhoto  = headerView.findViewById(R.id.drawer_user_photo);
+        android.widget.TextView tvName = headerView.findViewById(R.id.drawer_user_name);
+
+        // ── Foto profil dari SharedPreferences ──────────────────
+        String b64 = pref.getString("PROFILE_PHOTO_B64", null);
+        if (b64 != null && ivPhoto != null) {
+            try {
+                byte[] bytes = android.util.Base64.decode(b64, android.util.Base64.DEFAULT);
+                android.graphics.Bitmap bmp = android.graphics.BitmapFactory
+                        .decodeByteArray(bytes, 0, bytes.length);
+                ivPhoto.setImageBitmap(bmp);
+                ivPhoto.setPadding(0, 0, 0, 0);
+                // Hapus tint XML agar foto tidak berwarna hijau
+                androidx.core.widget.ImageViewCompat.setImageTintList(ivPhoto, null);
+            } catch (Exception ignored) {}
+        }
+
+        // ── Nama pengguna ────────────────────────────────────────
+        if (tvName != null) {
+            String savedName = pref.getString("PROFILE_DISPLAY_NAME", null);
+            if (savedName != null && !savedName.isEmpty()) {
+                tvName.setText(savedName);
+            } else {
+                com.google.firebase.auth.FirebaseUser user =
+                        com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null && user.getEmail() != null) {
+                    // Tampilkan bagian sebelum @ dari email
+                    String emailName = user.getEmail().split("@")[0];
+                    tvName.setText(emailName);
+                }
+            }
+        }
+    }
+
     private void showAboutDialog() {
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Tentang Aplikasi")
                 .setMessage("SORA - Smart Orchid Agro\n\n"
                         + "Sistem Penyiraman Anggrek Otomatis\n"
@@ -349,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Konfirmasi")
                 .setMessage("Yakin ingin keluar dari akun?")
                 .setPositiveButton("LANJUTKAN", (dialog, which) -> {
@@ -540,8 +596,8 @@ public class MainActivity extends AppCompatActivity {
      * berdasarkan nilai kelembapan tanah dan threshold kalibrasi.
      *
      * Logika:
-     *   - soilMoisture < KALIBRASI_KERING  → pompa ON  (tanah terlalu kering)
-     *   - soilMoisture >= KALIBRASI_NORMAL → pompa OFF (tanah sudah cukup lembap)
+     *   - soilMoisture < 60  → pompa ON  (tanah terlalu kering)
+     *   - soilMoisture > 80  → pompa OFF (tanah sudah cukup lembap)
      *   - di antara keduanya               → biarkan status pompa saat ini
      *
      * Emergency Stop selalu mengesampingkan auto-watering.
@@ -549,10 +605,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkAutoWatering(int soilMoisture) {
         if (!isAutoMode) return;
 
-
-
-        int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
-        int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
+        int thresholdKering = 60;
+        int thresholdNormal = 80;
 
         boolean currentPump = switchPump.isChecked();
 
@@ -565,9 +619,9 @@ public class MainActivity extends AppCompatActivity {
             pref.saveBoolean("STATUS_POMPA", true);
             updatePumpStatusUI(tvPumpStatus, true);
             dataManager.setPumpStatus(true);
-        } else if (soilMoisture >= thresholdNormal && currentPump) {
+        } else if (soilMoisture > thresholdNormal && currentPump) {
             // Tanah sudah lembap → matikan pompa
-            android.util.Log.d("SORA-AUTO", "Auto: Tanah lembap (" + soilMoisture + "% >= " + thresholdNormal + "%), pompa OFF");
+            android.util.Log.d("SORA-AUTO", "Auto: Tanah lembap (" + soilMoisture + "% > " + thresholdNormal + "%), pompa OFF");
             isPumpUpdating = true;
             switchPump.setChecked(false);
             isPumpUpdating = false;
@@ -582,12 +636,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateAutoThresholdLabel() {
         if (tvAutoThreshold == null) return;
-        int thresholdKering = pref.getInt("KALIBRASI_KERING", 30);
-        int thresholdNormal = pref.getInt("KALIBRASI_NORMAL", 60);
         if (isAutoMode) {
-            tvAutoThreshold.setText("Siram jika tanah < " + thresholdKering + "%, stop >= " + thresholdNormal + "%");
+            tvAutoThreshold.setText("Siram jika tanah < 60%, stop > 80%");
         } else {
-            tvAutoThreshold.setText("Siram jika tanah < " + thresholdKering + "%");
+            tvAutoThreshold.setText("Siram jika tanah < 60%");
         }
     }
 

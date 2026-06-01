@@ -58,26 +58,55 @@
             android:padding="16dp"
             android:gravity="center_horizontal">
 
-            <!-- Profile Avatar Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Profile Avatar dengan tombol ganti foto -->
+            <FrameLayout
+                android:id="@+id/frame_avatar"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginTop="32dp"
-                app:cardCornerRadius="60dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/green_header">
+                android:layout_marginTop="32dp">
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_profile"
-                    app:tint="@color/green_header"
-                    android:padding="24dp"
-                    android:background="#E8F5E9" />
-            </com.google.android.material.card.MaterialCardView>
+                <!-- Avatar circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_avatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:cardCornerRadius="60dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/green_header">
 
+                    <ImageView
+                        android:id="@+id/iv_profile_photo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile"
+                        android:padding="24dp"
+                        android:background="#E8F5E9" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Tombol kamera (ganti foto) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btn_change_photo"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="bottom|end"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/green_header">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@android:drawable/ic_menu_camera"
+                        app:tint="@color/white"
+                        android:contentDescription="Ganti Foto" />
+                </com.google.android.material.card.MaterialCardView>
+            </FrameLayout>
+
+            <!-- Email -->
             <TextView
                 android:id="@+id/tv_user_email"
                 android:layout_width="wrap_content"
@@ -85,17 +114,37 @@
                 android:layout_marginTop="16dp"
                 android:text="pengguna@email.com"
                 android:textColor="@color/text_main"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tv_user_name"
+            <!-- Nama + tombol edit -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Memuat Data..."
-                android:textColor="@color/text_sub"
-                android:textSize="14sp" />
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Memuat Data..."
+                    android:textColor="@color/text_sub"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btn_edit_name"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="6dp"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/green_header"
+                    android:contentDescription="Edit Nama" />
+            </LinearLayout>
+
 
             <!-- Info Card -->
             <com.google.android.material.card.MaterialCardView

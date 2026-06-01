@@ -33,21 +33,18 @@ public class SettingsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Settings menu items
-        LinearLayout itemCalibration = findViewById(R.id.item_calibration);
         LinearLayout itemNotifAlert = findViewById(R.id.item_notif_alert);
+        LinearLayout itemAbout = findViewById(R.id.item_about);
 
-        applyScaleAnimation(itemCalibration);
         applyScaleAnimation(itemNotifAlert);
-
-        itemCalibration.setOnClickListener(v -> {
-            startActivity(new Intent(this, CalibrationActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        });
+        applyScaleAnimation(itemAbout);
 
         itemNotifAlert.setOnClickListener(v -> {
             startActivity(new Intent(this, NotifAlertActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
+
+        itemAbout.setOnClickListener(v -> showAboutDialog());
 
         // Bottom Navigation — tab switch (crossfade)
         LinearLayout navHome = findViewById(R.id.nav_home);
@@ -125,7 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     @Override
@@ -150,5 +147,24 @@ public class SettingsActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
+    }
+
+    private void showAboutDialog() {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Tentang Aplikasi")
+                .setMessage("SORA - Smart Orchid Agro\n\n"
+                        + "Sistem Penyiraman Anggrek Otomatis\n"
+                        + "berbasis IoT.\n\n"
+                        + "Tim Pengembang:\n"
+                        + "- Muhammad Yoga\n"
+                        + "- Muhammad Naufal Nijami\n"
+                        + "- Muhammad Rhojani\n"
+                        + "- Devi Pusparina\n"
+                        + "- Nurlaila\n\n"
+                        + "Versi: 1.0.0\n"
+                        + "© 2026 SORA Team")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 }

@@ -1,38 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Drawer header: green background matching app header -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/bg_header"
-    android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
-    <!-- App icon / logo area -->
-    <ImageView
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="12dp"
-        android:src="@mipmap/ic_launcher_round"
-        android:contentDescription="@string/app_name" />
+    <!-- Foto profil pengguna (circular dengan border putih) -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:cardCornerRadius="21dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1.5dp"
+        app:strokeColor="#FFFFFF"
+        app:cardBackgroundColor="#E8F5E9">
 
-    <!-- App title -->
-    <TextView
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/drawer_user_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile"
+            android:padding="10dp"
+            android:contentDescription="Foto Pengguna" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Nama dan status -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Sistem Penyiraman Anggrek"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-    <!-- Connection status -->
-    <TextView
-        android:id="@+id/drawer_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="● Terhubung"
-        android:textColor="#A5D6A7"
-        android:textSize="13sp" />
+        <!-- Nama pengguna -->
+        <TextView
+            android:id="@+id/drawer_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pengguna"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Status koneksi -->
+        <TextView
+            android:id="@+id/drawer_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="● Terhubung"
+            android:textColor="#A5D6A7"
+            android:textSize="10sp" />
+    </LinearLayout>
 
 </LinearLayout>
