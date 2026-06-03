@@ -20,7 +20,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class NotificationsActivity extends AppCompatActivity {
+public class NotificationsActivity extends BaseDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +29,9 @@ public class NotificationsActivity extends AppCompatActivity {
 
         hideSystemNavBar();
         applyStatusBarInsets();
+        setupDrawer(); // Inisialisasi sidebar dari BaseDrawerActivity
 
-        // Back button
-        ImageView btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
+        // Tombol menu sudah ditangani oleh setupDrawer() di BaseDrawerActivity
 
         // Bottom Navigation — tab switch (crossfade)
         LinearLayout navHome = findViewById(R.id.nav_home);
@@ -140,11 +139,11 @@ public class NotificationsActivity extends AppCompatActivity {
                 headerBg.requestLayout();
             }
 
-            View btnBack = findViewById(R.id.btn_back);
-            if (btnBack != null && btnBack.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
-                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
+            View btnMenu = findViewById(R.id.btn_menu);
+            if (btnMenu != null && btnMenu.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnMenu.getLayoutParams();
                 p.topMargin = statusH;
-                btnBack.setLayoutParams(p);
+                btnMenu.setLayoutParams(p);
             }
 
             View tvTitle = findViewById(R.id.tv_header_title);
@@ -176,6 +175,9 @@ public class NotificationsActivity extends AppCompatActivity {
         });
     }
 
+    /** Kembali ke MainActivity dan langsung buka sidebar */
+    // Tidak dipakai lagi — sidebar sudah ada langsung di halaman ini
+
     @Override
     public void finish() {
         super.finish();
@@ -186,23 +188,5 @@ public class NotificationsActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) hideSystemNavBar();
-    }
-
-    private void hideSystemNavBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.navigationBars());
-                controller.setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        }
     }
 }

@@ -44,7 +44,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends BaseDrawerActivity {
 
     private LinearLayout containerHistory;
     private LinearLayout containerSensor;
@@ -70,6 +70,7 @@ public class HistoryActivity extends AppCompatActivity {
 
         hideSystemNavBar();
         applyStatusBarInsets();
+        setupDrawer(); // Inisialisasi sidebar dari BaseDrawerActivity
 
         containerHistory = findViewById(R.id.container_history);
         containerSensor  = findViewById(R.id.container_sensor);
@@ -117,9 +118,7 @@ public class HistoryActivity extends AppCompatActivity {
                         (float) tabIndicator.getWidth()).setDuration(200).start());
         });
 
-        // Back button
-        ImageView btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
+        // Tombol menu sudah ditangani oleh setupDrawer() di BaseDrawerActivity
 
         // Bottom Navigation
         LinearLayout navHome = findViewById(R.id.nav_home);
@@ -376,11 +375,11 @@ public class HistoryActivity extends AppCompatActivity {
                 headerBg.getLayoutParams().height = base60px + statusH;
                 headerBg.requestLayout();
             }
-            View btnBack = findViewById(R.id.btn_back);
-            if (btnBack != null && btnBack.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
-                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnBack.getLayoutParams();
+            View btnMenu = findViewById(R.id.btn_menu);
+            if (btnMenu != null && btnMenu.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams p = (ConstraintLayout.LayoutParams) btnMenu.getLayoutParams();
                 p.topMargin = statusH;
-                btnBack.setLayoutParams(p);
+                btnMenu.setLayoutParams(p);
             }
             View btnSync = findViewById(R.id.btn_sync);
             if (btnSync != null && btnSync.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
@@ -417,11 +416,8 @@ public class HistoryActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-    }
+    /** Kembali ke MainActivity dan langsung buka sidebar */
+    // Tidak dipakai lagi — sidebar sudah ada langsung di halaman ini
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -429,21 +425,9 @@ public class HistoryActivity extends AppCompatActivity {
         if (hasFocus) hideSystemNavBar();
     }
 
-    private void hideSystemNavBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.navigationBars());
-                controller.setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        }
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

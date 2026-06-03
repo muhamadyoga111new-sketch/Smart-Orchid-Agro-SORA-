@@ -129,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
         ImageView btnMenu = findViewById(R.id.btn_menu);
         btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
+        // Jika Activity lain mengirim flag OPEN_DRAWER, langsung buka sidebar
+        if (getIntent().getBooleanExtra("OPEN_DRAWER", false)) {
+            drawerLayout.post(() -> drawerLayout.openDrawer(GravityCompat.START));
+        }
+
         // Handle drawer menu clicks
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
