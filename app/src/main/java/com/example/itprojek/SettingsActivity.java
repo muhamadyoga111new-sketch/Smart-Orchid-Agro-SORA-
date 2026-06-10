@@ -33,15 +33,24 @@ public class SettingsActivity extends BaseDrawerActivity {
 
         // Settings menu items
         LinearLayout itemNotifAlert = findViewById(R.id.item_notif_alert);
+        LinearLayout itemWifiBluetooth = findViewById(R.id.item_wifi_bluetooth);
         LinearLayout itemAbout = findViewById(R.id.item_about);
 
         applyScaleAnimation(itemNotifAlert);
+        if (itemWifiBluetooth != null) applyScaleAnimation(itemWifiBluetooth);
         applyScaleAnimation(itemAbout);
 
         itemNotifAlert.setOnClickListener(v -> {
             startActivity(new Intent(this, NotifAlertActivity.class));
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
+
+        if (itemWifiBluetooth != null) {
+            itemWifiBluetooth.setOnClickListener(v -> {
+                startActivity(new Intent(this, BluetoothSetupActivity.class));
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            });
+        }
 
         itemAbout.setOnClickListener(v -> showAboutDialog());
 

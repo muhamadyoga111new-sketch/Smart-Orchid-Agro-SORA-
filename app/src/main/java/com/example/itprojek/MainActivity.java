@@ -37,11 +37,16 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
     // ── Device ID (sesuaikan dengan ID perangkat IoT Anda) ──
     private static final String DEVICE_ID = "ANG-123456";
+    private static final String DB_URL =
+            "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    private static final int MAX_JARAK = 15; // cm saat tangki kosong
 
     private PrefManager         pref;
     private DrawerLayout        drawerLayout;
@@ -75,6 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
         // === Firebase Realtime Database ===
         dataManager = new FirebaseDataManager(DEVICE_ID);
+
+        // === Mulai background service pencatat riwayat sensor (5 menit sekali) ===
+        Intent serviceIntent = new Intent(this, SensorRecorderService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
 
         // === Minta izin notifikasi (Android 13+) ===
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -268,12 +281,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // === Sensor Polling tiap 1 menit ===
-        // Callback bersama untuk polling sensor & pump listener
+        // Tampilkan nilai sensor terakhir dari SharedPreferences saat startup
+        int savedSoil  = pref.getInt("LAST_SOIL", 0);
+        int savedWater = pref.getInt("LAST_WATER", 0);
+        updateSensorUI(savedSoil, savedWater);
+
+        // === Sensor Real-time dari Firebase ===
         FirebaseDataManager.SensorListener sensorCallback = new FirebaseDataManager.SensorListener() {
             @Override
             public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
                 lastSoilMoisture = soilMoisture;
+                // Simpan nilai terbaru ke preferences
+                pref.saveInt("LAST_SOIL",  soilMoisture);
+                pref.saveInt("LAST_WATER", waterLevel);
                 updateSensorUI(soilMoisture, waterLevel);
                 // Cek kondisi sensor dan kirim notifikasi lokal jika diperlukan
                 checkAndNotify(soilMoisture, waterLevel);
@@ -302,14 +322,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(String errorMessage) {
                 android.util.Log.w("SORA-DB", "Sensor error: " + errorMessage);
+                runOnUiThread(() -> {
+                    android.widget.Toast.makeText(MainActivity.this, "Firebase Error: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                });
             }
         };
 
-        // === Sensor real-time (soil & water) ===
-        // listenSensorData akan langsung fire saat data berubah di Firebase
+        // Daftarkan listener real-time ke node status/
         dataManager.listenSensorData(sensorCallback);
-
-        // Pump status tetap real-time (sinkron dua arah dengan hardware)
         dataManager.startPumpListener(sensorCallback);
 
 

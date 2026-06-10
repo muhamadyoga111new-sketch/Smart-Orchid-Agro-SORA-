@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_app"
+    android:fitsSystemWindows="false">
+
+    <!-- Header -->
+    <View
+        android:id="@+id/header_bg"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="#4CAF50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Tombol Back -->
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/app_name"
+        android:padding="12dp"
+        android:src="@drawable/ic_back"
+        app:tint="@color/white"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="@id/header_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/header_bg" />
+
+    <TextView
+        android:id="@+id/tv_header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pengaturan WiFi Alat"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:fontFamily="@font/poppins_regular"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/header_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/header_bg" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Section: Hubungkan ke Alat -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. HUBUNGKAN KE ALAT (ESP32)"
+                android:textColor="@color/section_header"
+                android:textSize="13sp"
+                android:fontFamily="@font/poppins_regular"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/card_stroke"
+                android:layout_marginBottom="28dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <Button
+                        android:id="@+id/btn_scan_bluetooth"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="14dp"
+                        android:text="Pindai Perangkat Bluetooth"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:backgroundTint="#2196F3"
+                        android:stateListAnimator="@null"
+                        app:cornerRadius="12dp" />
+
+                    <TextView
+                        android:id="@+id/tv_bluetooth_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Status: Belum Terhubung"
+                        android:textColor="@color/text_main"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+
+                    <!-- List of Devices -->
+                    <ListView
+                        android:id="@+id/list_bluetooth_devices"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        android:divider="@color/divider"
+                        android:dividerHeight="1dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section: Kirim Konfigurasi -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. PENGATURAN WIFI"
+                android:textColor="@color/section_header"
+                android:textSize="13sp"
+                android:fontFamily="@font/poppins_regular"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/white"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/card_stroke"
+                android:layout_marginBottom="32dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Masukkan nama WiFi (SSID) dan Password baru untuk alat penyiraman Anda."
+                        android:textColor="@color/text_sub"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="4dp"
+                        android:layout_marginBottom="24dp" />
+
+                    <!-- Input SSID -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:hint="Nama WiFi (SSID)"
+                        app:hintTextColor="@color/text_sub"
+                        app:boxStrokeColor="#4CAF50"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_wifi_ssid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_regular"
+                            android:textSize="14sp"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Input Password -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:hint="Password WiFi"
+                        app:hintTextColor="@color/text_sub"
+                        app:boxStrokeColor="#4CAF50"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:passwordToggleEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_wifi_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_regular"
+                            android:textSize="14sp"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Button
+                        android:id="@+id/btn_send_config"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:paddingVertical="14dp"
+                        android:text="Simpan &amp; Kirim Konfigurasi"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:backgroundTint="#4CAF50"
+                        android:stateListAnimator="@null"
+                        app:cornerRadius="12dp"
+                        android:enabled="false" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

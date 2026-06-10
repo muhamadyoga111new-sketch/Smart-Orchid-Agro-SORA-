@@ -8,113 +8,112 @@
     android:fitsSystemWindows="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_notifications"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg_app">
 
-    <!-- Header -->
-    <View
-        android:id="@+id/header_bg"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:background="#4CAF50"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!-- Header -->
+        <View
+            android:id="@+id/header_bg"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:background="#4CAF50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/btn_menu"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:contentDescription="@string/app_name"
-        android:padding="8dp"
-        android:src="@drawable/ic_menu"
-        app:tint="@color/white"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless"
-        app:layout_constraintBottom_toBottomOf="@id/header_bg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/header_bg" />
+        <ImageView
+            android:id="@+id/btn_menu"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/app_name"
+            android:padding="8dp"
+            android:src="@drawable/ic_menu"
+            app:tint="@color/white"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="@id/header_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/header_bg" />
 
-    <TextView
-        android:id="@+id/tv_header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/notifikasi"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/header_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/header_bg" />
-
-
-
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_bg">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_header_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:text="@string/notifikasi"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/header_bg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/header_bg" />
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header_bg">
 
             <LinearLayout
-                android:id="@+id/container_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tv_empty_notif"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="80dp"
-                android:gravity="center"
-                android:text="Belum ada notifikasi"
-                android:textColor="#9E9E9E"
-                android:textSize="16sp"
-                android:visibility="gone" />
+                <LinearLayout
+                    android:id="@+id/container_notifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
 
-        </LinearLayout>
-    </ScrollView>
+                <TextView
+                    android:id="@+id/tv_empty_notif"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80dp"
+                    android:gravity="center"
+                    android:text="Belum ada notifikasi"
+                    android:textColor="#9E9E9E"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
 
-    <!-- Bottom Navigation -->
-    <LinearLayout
-        android:id="@+id/bottom_nav"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:background="@color/white"
-        android:elevation="12dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+            </LinearLayout>
+        </ScrollView>
 
-        <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+        <!-- Bottom Navigation -->
+        <LinearLayout
+            android:id="@+id/bottom_nav"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:background="@color/white"
+            android:elevation="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout android:id="@+id/nav_home" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_home" app:tint="@color/nav_inactive" android:contentDescription="@string/beranda" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/beranda" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_notification" app:tint="@color/nav_active" android:contentDescription="@string/notifikasi" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_active" android:textSize="11sp" android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
+                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" android:contentDescription="@string/pengaturan" app:tint="@color/nav_inactive" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
-        <LinearLayout android:id="@+id/nav_history" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_history" app:tint="@color/nav_inactive" android:contentDescription="@string/riwayat" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/riwayat" android:textColor="@color/nav_inactive" android:textSize="11sp" />
-        </LinearLayout>
-        <LinearLayout android:id="@+id/nav_notifications" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_notification" app:tint="@color/nav_active" android:contentDescription="@string/notifikasi" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/notifikasi" android:textColor="@color/nav_active" android:textSize="11sp" android:textStyle="bold" />
-        </LinearLayout>
-        <LinearLayout android:id="@+id/nav_settings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:foreground="?android:attr/selectableItemBackground">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_settings" android:contentDescription="@string/pengaturan" app:tint="@color/nav_inactive" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/pengaturan" android:textColor="@color/nav_inactive" android:textSize="11sp" />
-        </LinearLayout>
-    </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

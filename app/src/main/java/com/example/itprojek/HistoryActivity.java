@@ -57,11 +57,12 @@ public class HistoryActivity extends BaseDrawerActivity {
     private static final String DEVICE_ID  = "ANG-123456";
 
     private DatabaseReference historyRef;
-    private DatabaseReference soilRef;   // sensors/soil
-    private DatabaseReference waterRef;  // sensors/water
-    private DatabaseReference pumpRef;   // sensors/pump
+    private DatabaseReference soilRef;   // status/kelembapan
+    private DatabaseReference waterRef;  // status/jarak_tangki
+    private DatabaseReference pumpRef;   // status/pompa_status
     private ValueEventListener historyListener;
     private ValueEventListener sensorHistoryListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +84,11 @@ public class HistoryActivity extends BaseDrawerActivity {
         // Firebase
         FirebaseDatabase db = FirebaseDatabase.getInstance(DB_URL);
         historyRef = db.getReference("history").child(DEVICE_ID);
-        // Baca setiap field sensor secara terpisah (tanpa butuh izin baca root)
-        DatabaseReference sensorsRoot = db.getReference("sensors");
-        soilRef  = sensorsRoot.child("soil");
-        waterRef = sensorsRoot.child("water");
-        pumpRef  = sensorsRoot.child("pump");
+        // Baca setiap field sensor dari SORA/status/ node
+        DatabaseReference statusRoot = db.getReference("SORA/status");
+        soilRef  = statusRoot.child("kelembapan");
+        waterRef = statusRoot.child("jarak_tangki");
+        pumpRef  = statusRoot.child("pompa_status");
 
         fetchHistoryData();
         fetchSensorHistoryData();
@@ -203,7 +204,9 @@ public class HistoryActivity extends BaseDrawerActivity {
         });
         waterRef.addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot s) {
-                currentWater = toInt(s.getValue());
+                Object jarakObj = s.getValue();
+                int jarak = jarakObj != null ? toInt(jarakObj) : 25; // MAX_JARAK = 25cm
+                currentWater = Math.max(0, Math.min(100, (int) ((25 - jarak) * 100f / 25)));
                 updateCurrentSensorCard();
             }
             @Override public void onCancelled(@NonNull DatabaseError e) {}
@@ -211,24 +214,51 @@ public class HistoryActivity extends BaseDrawerActivity {
         pumpRef.addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot s) {
                 Object v = s.getValue();
-                if (v instanceof Boolean) currentPump = (Boolean) v;
-                else if (v instanceof Long) currentPump = ((Long) v) != 0;
+                // pompa_status adalah String "MENYALA" atau "MATI"
+                if (v instanceof String) currentPump = "MENYALA".equalsIgnoreCase((String) v);
+                else if (v instanceof Boolean) currentPump = (Boolean) v;
+                else if (v instanceof Long)    currentPump = ((Long) v) != 0;
                 updateCurrentSensorCard();
             }
             @Override public void onCancelled(@NonNull DatabaseError e) {}
         });
 
         // Listener riwayat perubahan dari history/{deviceId}
-        historyRef.addValueEventListener(new ValueEventListener() {
+        sensorHistoryListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Hapus entri > 1 jam dari Firebase terlebih dahulu
+                purgeOldSensorHistory(snapshot);
                 buildSensorHistoryList(snapshot);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError e) {
                 android.util.Log.e("SORA-DB", "sensorHistory cancelled: " + e.getMessage());
             }
-        });
+        };
+        historyRef.addValueEventListener(sensorHistoryListener);
+    }
+
+    /**
+     * Hapus entri riwayat sensor yang lebih dari 1 jam dari Firebase.
+     * Timestamp format: "yyyy-MM-dd HH:mm:ss"
+     */
+    private void purgeOldSensorHistory(DataSnapshot snapshot) {
+        if (!snapshot.exists() || !snapshot.hasChildren()) return;
+        long cutoff = System.currentTimeMillis() - (60L * 60 * 1000); // 1 jam lalu
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        for (DataSnapshot ds : snapshot.getChildren()) {
+            Object tsObj = ds.child("timestamp").getValue();
+            if (tsObj == null) continue;
+            String ts = tsObj.toString();
+            try {
+                Date entryDate = sdf.parse(ts);
+                if (entryDate != null && entryDate.getTime() < cutoff) {
+                    // Hapus dari Firebase
+                    ds.getRef().removeValue();
+                }
+            } catch (ParseException ignored) {}
+        }
     }
 
     /** Kartu TERKINI di bagian atas tab Data Sensor — refresh saat sensor real-time berubah */
@@ -276,9 +306,22 @@ public class HistoryActivity extends BaseDrawerActivity {
         // Riwayat perubahan dari history/{deviceId}
         if (!snapshot.exists() || !snapshot.hasChildren()) return;
 
-        // Kumpulkan & balik (terbaru dulu)
+        // Kumpulkan, filter hanya ≤ 1 jam, lalu balik (terbaru dulu)
+        long cutoff = System.currentTimeMillis() - (60L * 60 * 1000);
+        SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         List<DataSnapshot> entries = new ArrayList<>();
-        for (DataSnapshot ds : snapshot.getChildren()) entries.add(ds);
+        for (DataSnapshot ds : snapshot.getChildren()) {
+            Object tsObj = ds.child("timestamp").getValue();
+            if (tsObj == null) continue;
+            try {
+                Date entryDate = sdfParse.parse(tsObj.toString());
+                if (entryDate != null && entryDate.getTime() >= cutoff) {
+                    entries.add(ds);
+                }
+            } catch (ParseException ignored) {
+                entries.add(ds); // kalau format tidak dikenali, tetap tampilkan
+            }
+        }
         Collections.reverse(entries);
 
         // Kelompokkan per tanggal
@@ -361,7 +404,9 @@ public class HistoryActivity extends BaseDrawerActivity {
         if (historyRef != null && historyListener != null) {
             historyRef.removeEventListener(historyListener);
         }
-        // soilRef, waterRef, pumpRef listeners di-handle secara otomatis oleh Firebase SDK
+        if (historyRef != null && sensorHistoryListener != null) {
+            historyRef.removeEventListener(sensorHistoryListener);
+        }
     }
 
     private void applyStatusBarInsets() {
