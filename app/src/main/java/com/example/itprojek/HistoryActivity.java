@@ -60,6 +60,7 @@ public class HistoryActivity extends BaseDrawerActivity {
     private DatabaseReference soilRef;   // status/kelembapan
     private DatabaseReference waterRef;  // status/jarak_tangki
     private DatabaseReference pumpRef;   // status/pompa_status
+    private DatabaseReference soraRiwayatRef; // riwayat dari ESP32
     private ValueEventListener historyListener;
     private ValueEventListener sensorHistoryListener;
 
@@ -89,6 +90,7 @@ public class HistoryActivity extends BaseDrawerActivity {
         soilRef  = statusRoot.child("kelembapan");
         waterRef = statusRoot.child("jarak_tangki");
         pumpRef  = statusRoot.child("pompa_status");
+        soraRiwayatRef = db.getReference("SORA/riwayat");
 
         fetchHistoryData();
         fetchSensorHistoryData();
@@ -147,23 +149,47 @@ public class HistoryActivity extends BaseDrawerActivity {
         });
     }
 
-    // Tab Penyiraman — riwayat penyiraman manual/otomatis (terpisah dari data sensor)
+    // Tab Penyiraman — riwayat penyiraman manual/otomatis (dari ESP32)
     private void fetchHistoryData() {
         historyListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (containerHistory == null) return;
                 containerHistory.removeAllViews();
-                // Tab ini menampilkan riwayat penyiraman (pump ON/OFF events).
-                // Untuk sekarang tidak ada data penyiraman terpisah.
-                showEmptyState(containerHistory, "Belum ada riwayat penyiraman.");
+                
+                if (!snapshot.exists() || !snapshot.hasChildren()) {
+                    showEmptyState(containerHistory, "Belum ada riwayat penyiraman.");
+                    return;
+                }
+
+                LayoutInflater inflater = LayoutInflater.from(HistoryActivity.this);
+                
+                List<DataSnapshot> entries = new ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    entries.add(ds);
+                }
+                Collections.reverse(entries); // urutkan terbaru di atas
+
+                for (DataSnapshot ds : entries) {
+                    int before = toInt(ds.child("kelembapan_sebelum").getValue());
+                    int after  = toInt(ds.child("kelembapan_sesudah").getValue());
+                    Object tObj = ds.child("waktu").getValue();
+                    String time = tObj != null ? tObj.toString() : "-";
+
+                    View card = inflater.inflate(R.layout.item_riwayat_card, containerHistory, false);
+                    TextView tvDetail = card.findViewById(R.id.tv_history_detail);
+                    if (tvDetail != null) {
+                        tvDetail.setText(time + "  ·  Lembap: " + before + "% ➔ " + after + "%");
+                    }
+                    containerHistory.addView(card);
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 showEmptyState(containerHistory, "Akses ditolak (" + error.getCode() + ").");
             }
         };
-        historyRef.addValueEventListener(historyListener);
+        soraRiwayatRef.addValueEventListener(historyListener);
     }
 
     /** Helper toInt (duplikat dari FirebaseDataManager agar independen) */
