@@ -193,6 +193,16 @@
                     app:tint="@color/text_sub" />
             </FrameLayout>
 
+            <TextView
+                android:id="@+id/tv_login_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Password salah, silakan coba lagi"
+                android:textColor="#D32F2F"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <!-- ===== TOMBOL LOGIN ===== -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btn_login"

@@ -17,17 +17,34 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
+
+    // ── SharedPreferences Keys for Brute Force Protection ──
+    private static final String PREFS_NAME          = "sora_login_prefs";
+    private static final String KEY_FAILED_ATTEMPTS = "failed_attempts";
+    private static final String KEY_LOCKOUT_COUNT   = "lockout_count";
+    private static final String KEY_LOCKOUT_UNTIL   = "lockout_until";
+
+    private Handler  lockoutHandler  = new Handler(Looper.getMainLooper());
+    private Runnable lockoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            checkLockoutStatus();
+        }
+    };
 
     // ── Firebase Auth ──
     private FirebaseAuth mAuth;
 
     // ── Views ──
     private EditText     etEmail, etPassword;
-    private TextView     tvLoginText, tvTapHint;
+    private TextView     tvLoginText, tvTapHint, tvLoginError;
     private ImageView    ivTogglePassword;
     private CardView     btnLogin, cardLogin;
     private View         progressLogin;
@@ -57,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword       = findViewById(R.id.et_password);
         tvLoginText      = findViewById(R.id.tv_login_text);
         tvTapHint        = findViewById(R.id.tv_tap_hint);
+        tvLoginError     = findViewById(R.id.tv_login_error);
         ivTogglePassword = findViewById(R.id.iv_toggle_password);
         btnLogin         = findViewById(R.id.btn_login);
         progressLogin    = findViewById(R.id.progress_login);
@@ -78,6 +96,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Tombol Login
         btnLogin.setOnClickListener(v -> attemptLogin());
+
+        // Cek status blokir saat pertama kali dibuka
+        checkLockoutStatus();
     }
 
     // ─────────────────────────────────────────────
@@ -164,6 +185,12 @@ public class LoginActivity extends AppCompatActivity {
     //  Logika Login dengan Firebase Auth
     // ─────────────────────────────────────────────
     private void attemptLogin() {
+        if (checkLockoutStatus()) {
+            return;
+        }
+        // Sembunyikan pesan error sebelumnya setiap kali mencoba login
+        tvLoginError.setVisibility(View.GONE);
+
         String email    = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
@@ -188,15 +215,109 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     showLoading(false);
                     if (task.isSuccessful()) {
+                        // Reset status brute force
+                        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                        editor.putInt(KEY_FAILED_ATTEMPTS, 0);
+                        editor.putInt(KEY_LOCKOUT_COUNT, 0);
+                        editor.putLong(KEY_LOCKOUT_UNTIL, 0);
+                        editor.apply();
+
                         goToMain();
                     } else {
-                        String errMsg = task.getException() != null
-                                ? task.getException().getMessage()
-                                : "Login gagal. Periksa email dan password.";
-                        Toast.makeText(this, errMsg, Toast.LENGTH_LONG).show();
+                        handleFailedLogin();
                         etPassword.setText("");
+
+                        // Tentukan pesan berdasarkan jenis error Firebase
+                        Exception exception = task.getException();
+                        String errorMessage;
+                        if (exception != null) {
+                            String errCode = exception.getMessage() != null
+                                    ? exception.getMessage().toLowerCase() : "";
+                            if (errCode.contains("no user record") ||
+                                errCode.contains("user-not-found") ||
+                                errCode.contains("there is no user")) {
+                                errorMessage = "Akun tidak ditemukan. Periksa kembali email Anda.";
+                            } else if (errCode.contains("password is invalid") ||
+                                       errCode.contains("wrong-password") ||
+                                       errCode.contains("incorrect") ||
+                                       errCode.contains("invalid credential") ||
+                                       errCode.contains("malformed")) {
+                                errorMessage = "Password salah, silakan coba lagi.";
+                            } else if (errCode.contains("badly formatted") ||
+                                       errCode.contains("invalid-email")) {
+                                errorMessage = "Format email tidak valid.";
+                            } else if (errCode.contains("too many requests") ||
+                                       errCode.contains("blocked")) {
+                                errorMessage = "Terlalu banyak percobaan. Coba lagi nanti.";
+                            } else {
+                                errorMessage = "Login gagal. Periksa email dan password Anda.";
+                            }
+                        } else {
+                            errorMessage = "Login gagal. Periksa email dan password Anda.";
+                        }
+                        tvLoginError.setText(errorMessage);
+                        tvLoginError.setVisibility(View.VISIBLE);
                     }
                 });
+    }
+
+    // ─────────────────────────────────────────────
+    //  Proteksi Brute Force & Lockout
+    // ─────────────────────────────────────────────
+    private boolean checkLockoutStatus() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        long lockoutUntil = prefs.getLong(KEY_LOCKOUT_UNTIL, 0);
+        long now = System.currentTimeMillis();
+
+        if (now < lockoutUntil) {
+            long remainingSeconds = (lockoutUntil - now) / 1000;
+            btnLogin.setClickable(false);
+            btnLogin.setAlpha(0.6f);
+            tvLoginText.setText("Terkunci (" + remainingSeconds + "s)");
+
+            lockoutHandler.removeCallbacks(lockoutRunnable);
+            lockoutHandler.postDelayed(lockoutRunnable, 1000);
+            return true;
+        } else {
+            if (progressLogin.getVisibility() != View.VISIBLE) {
+                btnLogin.setClickable(true);
+                btnLogin.setAlpha(1.0f);
+                tvLoginText.setText("Masuk");
+            }
+            return false;
+        }
+    }
+
+    private void handleFailedLogin() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int failedAttempts = prefs.getInt(KEY_FAILED_ATTEMPTS, 0) + 1;
+        int lockoutCount = prefs.getInt(KEY_LOCKOUT_COUNT, 0);
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(KEY_FAILED_ATTEMPTS, failedAttempts);
+
+        if (failedAttempts >= 5) {
+            lockoutCount++;
+            // Rumus durasi blokir eksponensial: 60 * 2^(lockoutCount - 1) detik
+            long durationSeconds = 60L * (long) Math.pow(2, lockoutCount - 1);
+            long lockoutUntil = System.currentTimeMillis() + (durationSeconds * 1000);
+
+            editor.putInt(KEY_LOCKOUT_COUNT, lockoutCount);
+            editor.putLong(KEY_LOCKOUT_UNTIL, lockoutUntil);
+            editor.apply();
+
+            checkLockoutStatus();
+        } else {
+            editor.apply();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (lockoutHandler != null) {
+            lockoutHandler.removeCallbacks(lockoutRunnable);
+        }
+        super.onDestroy();
     }
 
     // ─────────────────────────────────────────────
