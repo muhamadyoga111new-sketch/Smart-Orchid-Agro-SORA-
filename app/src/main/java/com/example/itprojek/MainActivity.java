@@ -275,10 +275,9 @@ public class MainActivity extends AppCompatActivity {
             // Disable/enable manual pump switch
             switchPump.setEnabled(!isAutoMode);
             updateAutoThresholdLabel();
-            if (isAutoMode) {
-                // Langsung cek kondisi berdasarkan nilai sensor terakhir
-                checkAutoWatering(lastSoilMoisture);
-            }
+            
+            // Tulis perubahan mode ke Firebase
+            dataManager.setMode(isAutoMode ? "auto" : "manual");
         });
 
         // Tampilkan nilai sensor terakhir dari SharedPreferences saat startup
@@ -289,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         // === Sensor Real-time dari Firebase ===
         FirebaseDataManager.SensorListener sensorCallback = new FirebaseDataManager.SensorListener() {
             @Override
-            public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
+            public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus, String mode) {
                 lastSoilMoisture = soilMoisture;
                 // Simpan nilai terbaru ke preferences
                 pref.saveInt("LAST_SOIL",  soilMoisture);
@@ -298,24 +297,25 @@ public class MainActivity extends AppCompatActivity {
                 // Cek kondisi sensor dan kirim notifikasi lokal jika diperlukan
                 checkAndNotify(soilMoisture, waterLevel);
 
-                if (isAutoMode) {
-                    checkAutoWatering(soilMoisture);
-                    // Tetap reflect perubahan pompa dari hardware di UI
-                    if (switchPump.isChecked() != pumpStatus) {
-                        isPumpUpdating = true;
-                        switchPump.setChecked(pumpStatus);
-                        isPumpUpdating = false;
-                        updatePumpStatusUI(tvPumpStatus, pumpStatus);
-                    }
-                } else {
-                    // Mode manual: sync pompa dari Firebase ke UI
-                    if (switchPump.isChecked() != pumpStatus) {
-                        isPumpUpdating = true;
-                        switchPump.setChecked(pumpStatus);
-                        isPumpUpdating = false;
-                        pref.saveBoolean("STATUS_POMPA", pumpStatus);
-                        updatePumpStatusUI(tvPumpStatus, pumpStatus);
-                    }
+                // Sync mode dari Firebase ke UI
+                boolean fbAutoMode = "auto".equalsIgnoreCase(mode);
+                if (isAutoMode != fbAutoMode) {
+                    isAutoUpdating = true;
+                    switchAutoMode.setChecked(fbAutoMode);
+                    isAutoMode = fbAutoMode;
+                    pref.saveBoolean("AUTO_MODE", isAutoMode);
+                    switchPump.setEnabled(!isAutoMode);
+                    updateAutoThresholdLabel();
+                    isAutoUpdating = false;
+                }
+
+                // Sync pompa dari Firebase ke UI
+                if (switchPump.isChecked() != pumpStatus) {
+                    isPumpUpdating = true;
+                    switchPump.setChecked(pumpStatus);
+                    isPumpUpdating = false;
+                    pref.saveBoolean("STATUS_POMPA", pumpStatus);
+                    updatePumpStatusUI(tvPumpStatus, pumpStatus);
                 }
             }
 
@@ -617,43 +617,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * Cek apakah penyiraman otomatis perlu diaktifkan/dinonaktifkan
-     * berdasarkan nilai kelembapan tanah dan threshold kalibrasi.
-     *
-     * Logika:
-     *   - soilMoisture < 60  → pompa ON  (tanah terlalu kering)
-     *   - soilMoisture > 80  → pompa OFF (tanah sudah cukup lembap)
-     *   - di antara keduanya               → biarkan status pompa saat ini
-     *
-     * Emergency Stop selalu mengesampingkan auto-watering.
+     * Di versi baru ini, aplikasi Android tidak lagi mengontrol pompa secara otomatis.
+     * Tugas ini diserahkan sepenuhnya kepada perangkat IoT (ESP32) untuk menghindari bentrok.
      */
     private void checkAutoWatering(int soilMoisture) {
-        if (!isAutoMode) return;
-
-        int thresholdKering = 60;
-        int thresholdNormal = 80;
-
-        boolean currentPump = switchPump.isChecked();
-
-        if (soilMoisture < thresholdKering && !currentPump) {
-            // Tanah kering → nyalakan pompa
-            android.util.Log.d("SORA-AUTO", "Auto: Tanah kering (" + soilMoisture + "% < " + thresholdKering + "%), pompa ON");
-            isPumpUpdating = true;
-            switchPump.setChecked(true);
-            isPumpUpdating = false;
-            pref.saveBoolean("STATUS_POMPA", true);
-            updatePumpStatusUI(tvPumpStatus, true);
-            dataManager.setPumpStatus(true);
-        } else if (soilMoisture > thresholdNormal && currentPump) {
-            // Tanah sudah lembap → matikan pompa
-            android.util.Log.d("SORA-AUTO", "Auto: Tanah lembap (" + soilMoisture + "% > " + thresholdNormal + "%), pompa OFF");
-            isPumpUpdating = true;
-            switchPump.setChecked(false);
-            isPumpUpdating = false;
-            pref.saveBoolean("STATUS_POMPA", false);
-            updatePumpStatusUI(tvPumpStatus, false);
-            dataManager.setPumpStatus(false);
-        }
+        // Logika lokal dihapus, alat IoT yang menangani.
     }
 
     /**

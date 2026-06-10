@@ -98,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
         dataManager = new FirebaseDataManager(DEVICE_ID);
         dataManager.listenSensorData(new FirebaseDataManager.SensorListener() {
             @Override
-            public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus) {
+            public void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus, String mode) {
                 runOnUiThread(() -> {
                     updateSoilMoisture(soilMoisture);
                     updateWaterLevel(waterLevel);

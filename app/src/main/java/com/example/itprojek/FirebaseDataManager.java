@@ -16,21 +16,21 @@ import java.util.Map;
  * ─────────────────────────────────────────────────────────────────
  * Membaca data real-time dari IoT sensor SORA.
  *
- * Struktur Database (ditulis oleh IoT device):
+ * Struktur Database:
  *   status/
  *     kelembapan   : int     → kelembapan tanah real-time
  *     jarak_tangki : int     → jarak sensor ke permukaan air
- *     pompa_status : String  → "MENYALA" / "MATI"
- *     air_rendah   : boolean → air hampir habis
- *     tangki_kosong: boolean → tangki kosong
- *     last_update  : String  → "yyyy-MM-dd HH:mm:ss"
  *
- *   history/{deviceId}/{pushKey}/ → snapshot otomatis saat data berubah
+ *   kontrol/
+ *     mode         : String  → "auto" atau "manual"
+ *     pompa        : boolean → true (menyala) / false (mati)
+ *
+ *   history/{deviceId}/{pushKey}/
  *     soil       : int
  *     water      : int
  *     pump       : boolean
- *     status     : String  ("Kering" / "Normal" / "Lembap")
- *     timestamp  : String  ("yyyy-MM-dd HH:mm:ss")
+ *     status     : String
+ *     timestamp  : String
  */
 public class FirebaseDataManager {
 
@@ -39,15 +39,17 @@ public class FirebaseDataManager {
             "https://sora-app-9f18a-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
     public interface SensorListener {
-        void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus);
+        void onSensorUpdated(int soilMoisture, int waterLevel, boolean pumpStatus, String mode);
         void onError(String errorMessage);
     }
 
     // ── Referensi Firebase ───────────────────────────────────────────
     private final DatabaseReference soilRef;    // status/kelembapan
     private final DatabaseReference waterRef;   // status/jarak_tangki
-    private final DatabaseReference pumpRef;    // status/pompa_status
     private final DatabaseReference statusRef;  // status/ (root)
+    private final DatabaseReference kontrolRef; // kontrol/ (root)
+    private final DatabaseReference modeRef;    // kontrol/mode
+    private final DatabaseReference pumpRef;    // kontrol/pompa
     private final DatabaseReference historyRef; // history/{deviceId}
 
     // ── Konstanta konversi ────────────────────────────────────────────
@@ -58,11 +60,13 @@ public class FirebaseDataManager {
 
     // ── Listeners aktif ──────────────────────────────────────────────
     private ValueEventListener statusListener;  // listener node status/ (real-time)
+    private ValueEventListener kontrolListener; // listener node kontrol/ (real-time)
 
     // ── Nilai terakhir yang diketahui ────────────────────────────────
     private int     lastSoil  = -1; // -1 = belum pernah dapat data
     private int     lastWater = -1;
     private boolean lastPump  = false;
+    private String  lastMode  = "manual";
     
     private android.os.Handler pollingHandler;
     private Runnable pollingRunnable;
@@ -74,8 +78,13 @@ public class FirebaseDataManager {
         DatabaseReference statusRoot = db.getReference("SORA/status");
         soilRef    = statusRoot.child("kelembapan");
         waterRef   = statusRoot.child("jarak_tangki");
-        pumpRef    = statusRoot.child("pompa_status");
         statusRef  = statusRoot;
+
+        DatabaseReference kontrolRoot = db.getReference("SORA/kontrol");
+        kontrolRef = kontrolRoot;
+        modeRef    = kontrolRoot.child("mode");
+        pumpRef    = kontrolRoot.child("pompa");
+
         historyRef = db.getReference("history").child(deviceId);
     }
 
@@ -90,30 +99,18 @@ public class FirebaseDataManager {
         statusListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Baca kelembapan langsung
                 int soil = toInt(snapshot.child("kelembapan").getValue());
 
-                // Konversi jarak_tangki → persentase air
                 Object jarakObj = snapshot.child("jarak_tangki").getValue();
                 int jarak = jarakObj != null ? toInt(jarakObj) : MAX_JARAK_TANGKI;
                 int water = Math.max(0, Math.min(100,
                         (int) ((MAX_JARAK_TANGKI - jarak) * 100f / MAX_JARAK_TANGKI)));
 
-                // Baca status pompa
-                Object pObj = snapshot.child("pompa_status").getValue();
-                boolean pump = false;
-                if (pObj instanceof String)  pump = "MENYALA".equalsIgnoreCase((String) pObj);
-                else if (pObj instanceof Boolean) pump = (Boolean) pObj;
-
                 lastSoil  = soil;
                 lastWater = water;
-                lastPump  = pump;
 
-                Log.d(TAG, "status/ updated: kelembapan=" + soil
-                        + " jarak=" + jarak + " air%=" + water
-                        + " pompa=" + (pump ? "MENYALA" : "MATI"));
-
-                listener.onSensorUpdated(lastSoil, lastWater, lastPump);
+                Log.d(TAG, "status/ updated: kelembapan=" + soil + " air%=" + water);
+                listener.onSensorUpdated(lastSoil, lastWater, lastPump, lastMode);
             }
 
             @Override
@@ -122,7 +119,31 @@ public class FirebaseDataManager {
             }
         };
         statusRef.addValueEventListener(statusListener);
-        // Timer riwayat dijalankan oleh SensorRecorderService (bukan di sini)
+
+        kontrolListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Object mObj = snapshot.child("mode").getValue();
+                String mode = "manual";
+                if (mObj instanceof String) mode = (String) mObj;
+
+                Object pObj = snapshot.child("pompa").getValue();
+                boolean pump = false;
+                if (pObj instanceof Boolean) pump = (Boolean) pObj;
+
+                lastMode = mode;
+                lastPump = pump;
+
+                Log.d(TAG, "kontrol/ updated: mode=" + mode + " pompa=" + pump);
+                listener.onSensorUpdated(lastSoil, lastWater, lastPump, lastMode);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onError("kontrol/ listener cancelled: " + error.getMessage());
+            }
+        };
+        kontrolRef.addValueEventListener(kontrolListener);
     }
 
     /** Real-time listener khusus pompa (delegate ke statusListener) */
@@ -137,6 +158,10 @@ public class FirebaseDataManager {
             statusRef.removeEventListener(statusListener);
             statusListener = null;
         }
+        if (kontrolListener != null) {
+            kontrolRef.removeEventListener(kontrolListener);
+            kontrolListener = null;
+        }
         if (pollingHandler != null && pollingRunnable != null) {
             pollingHandler.removeCallbacks(pollingRunnable);
             pollingRunnable = null;
@@ -144,11 +169,16 @@ public class FirebaseDataManager {
         }
     }
 
-    /** Tulis status pompa → dibaca IoT device */
+    /** Tulis status pompa ke SORA/kontrol/pompa (boolean) */
     public void setPumpStatus(boolean isOn) {
-        // Tulis sebagai String "MENYALA"/"MATI" sesuai format Firebase
-        pumpRef.setValue(isOn ? "MENYALA" : "MATI");
+        pumpRef.setValue(isOn);
         lastPump = isOn;
+    }
+
+    /** Tulis status mode ke SORA/kontrol/mode (String) */
+    public void setMode(String mode) {
+        modeRef.setValue(mode);
+        lastMode = mode;
     }
 
     /** Tulis data sensor manual (simulator/testing) */
